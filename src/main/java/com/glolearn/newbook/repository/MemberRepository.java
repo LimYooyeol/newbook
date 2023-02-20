@@ -1,6 +1,5 @@
 package com.glolearn.newbook.repository;
 
-import com.glolearn.newbook.annotation.Auth;
 import com.glolearn.newbook.domain.Member;
 import com.glolearn.newbook.domain.OAuthDomain;
 import com.glolearn.newbook.domain.QMember;
@@ -17,9 +16,10 @@ public class MemberRepository {
 
     private final EntityManager em;
 
+
     public void save(Member member) {em.persist(member);}
 
-    public Member findByMemberId(Long memberId) {return em.find(Member.class, memberId);}
+    public Member findById(Long id) {return em.find(Member.class, id);}
 
     public Member findByOAuthIdAndOAuthDomain(String oAuthId, OAuthDomain oAuthDomain) {
         JPAQueryFactory query = new JPAQueryFactory(em);

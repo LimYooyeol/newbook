@@ -19,16 +19,12 @@ class MemberRepositoryTest {
     @Rollback(false)
     public void 회원삽입_테스트(){
         // given
-        Member member = new Member();
-        member.setOAuthDomain(OAuthDomain.KAKAO);
-        member.setOAuthId("asdf");
-        member.setNickname("회원1");
-
+        Member member = Member.createMember("asdf",OAuthDomain.KAKAO, "회원1");
         // when
         memberRepository.save(member);
 
         // then
-        assertEquals(member, memberRepository.findByMemberId(member.getId()));
+        assertEquals(member, memberRepository.findById(member.getId()));
     }
 
     @Test

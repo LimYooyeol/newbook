@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html
+        xmlns:th = "http://www.thymeleaf.org">
+<nav th:fragment="nav" class="navbar navbar-expand-lg navbar-light bg-light">
+    <a class="navbar-brand" href="/">GLL 글로런</a>
+
+    <div class="collapse navbar-collapse" id="navbarTogglerDemo03">
+        <ul class="navbar-nav mr-auto mt-2 mt-lg-0">
+            <li class="nav-item active">
+                <a class="nav-link" href="#">강의</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="#">강의실</a>
+            </li>
+        </ul>
+        <ul class="navbar-nav my-2 my-sm-0">
+            <li class="nav-item active">
+                <a th:if="${nickname == null}" class="nav-link" href="/login">로그인</a>
+            </li>
+            <li th:if="${nickname}" class="nav-item active">
+                <form id = "logoutForm" action="/oauth/token" th:method="DELETE">
+                    <button type="submit">로그아웃</button>
+                </form>
+            </li>
+            <li th:if="${nickname}">
+                <span th:text = "${nickname}"></span>
+            </li>
+        </ul>
+    </div>
+</nav>
+</html>

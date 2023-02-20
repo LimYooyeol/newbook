@@ -1,31 +1,24 @@
 package com.glolearn.newbook.aspect;
 
 import com.glolearn.newbook.context.UserContext;
-import com.glolearn.newbook.domain.Authorization;
-import com.glolearn.newbook.exception.InvalidAccessTokenException;
-import com.glolearn.newbook.repository.AuthorizationRepository;
-import com.glolearn.newbook.service.LoginService;
+import com.glolearn.newbook.domain.RefreshToken;
+import com.glolearn.newbook.repository.RefreshTokenRepository;
+import com.glolearn.newbook.service.AuthService;
 import com.glolearn.newbook.utils.JwtUtils;
 import lombok.RequiredArgsConstructor;
-import org.apache.catalina.User;
-import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.After;
-import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Before;
-import org.springframework.context.annotation.Bean;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseCookie;
 import org.springframework.stereotype.Component;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
-import org.springframework.web.context.request.ServletWebRequest;
 import org.springframework.web.util.WebUtils;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.util.Objects;
 
 @Aspect
 @Component
@@ -33,9 +26,15 @@ import java.util.Objects;
 public class AuthAspect {
     private final JwtUtils jwtUtils;
 
-    private final AuthorizationRepository authorizationRepository;
-    private final LoginService loginService;
+    private final RefreshTokenRepository refreshTokenRepository;
+    private final AuthService authService;
 
+
+    /*
+        #shorts :
+            인증이 필요한 요청 앞에서 동작
+            token 값을 보고 UserContext 에 회원번호 기록
+     */
     @Before("@annotation(com.glolearn.newbook.annotation.Auth)")
     public void authorization() throws Throwable {
 
@@ -49,22 +48,27 @@ public class AuthAspect {
 
 
         if(jwtUtils.validate(accessToken)){
-            // access
+            // access token 으로 인증
             UserContext.setCurrentMember(jwtUtils.getSub(accessToken));
             UserContext.setReissueFlag(false);
         }else if(jwtUtils.validate(refreshToken)){
             // refresh token 으로 인증
-            Authorization findAuth = authorizationRepository.findByTokenId(jwtUtils.getRefreshTokenId(refreshToken));
+            RefreshToken findAuth = refreshTokenRepository.findByTokenId(jwtUtils.getRefreshTokenId(refreshToken));
             if(findAuth != null){   // refresh token 으로 서버인증까지 성공한 경우
-                UserContext.setCurrentMember(findAuth.getMemberId());
+                UserContext.setCurrentMember(findAuth.getMember().getId());
                 UserContext.setReissueFlag(true);
             }
-        }else{
+        }else{ // 인증 실패
             UserContext.setUnAuthorized();
             UserContext.setReissueFlag(false);
         }
     }
 
+    /*
+        #shorts :
+            인증 후 ThreadLocal 초기화
+            Refresh token 으로 인증한 경우 access token 과 refresh token 재발행
+     */
     @After("@annotation(com.glolearn.newbook.annotation.Auth)")
     public void endAuthorization(){
         HttpServletResponse response = ((ServletRequestAttributes)RequestContextHolder.getRequestAttributes()).getResponse();
@@ -72,11 +76,11 @@ public class AuthAspect {
 
         Long memberId = UserContext.getCurrentMember();
 
-        // token 재발행 -> refresh token 으로 인증한 경우
+        // refresh token 으로 인증한 경우 -> 토큰 재발행
         if(UserContext.getReissueFlag() != null && UserContext.getReissueFlag() == true){
 
             String userAccessToken = jwtUtils.createAccessToken(memberId);
-            String userRefreshToken = loginService.addAuthorization(memberId);
+            String userRefreshToken = authService.addAuthorization(memberId);
 
             HttpHeaders headers = new HttpHeaders();
 

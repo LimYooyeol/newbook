@@ -18,7 +18,7 @@ public class KakaoOAuthProvider implements OAuthProvider {
                 .uri(uriBuilder -> uriBuilder.path("/oauth/token")
                         .queryParam("grant_type", "authorization_code")
                         .queryParam("client_id", "3dcf523718ad3e80be2e1d8d2e898520")
-                        .queryParam("redirect_uri", "http://localhost:8080/authentication") // 보안상 필요?
+                        .queryParam("redirect_uri", "http://localhost:8080/oauth/kakao/token") // 보안상 필요
                         .queryParam("code", code)
                         .build()
                 ).retrieve().bodyToMono(String.class).block();

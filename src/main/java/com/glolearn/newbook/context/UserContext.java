@@ -6,6 +6,11 @@ public class UserContext {
 
     private static ThreadLocal<Boolean> reissueFlag = new ThreadLocal<>();
 
+    /*
+        #return :
+            로그인 한 경우 -> member_id (token 에서 얻은 값)
+            token 없는 경우 -> -1
+     */
     public static Long getCurrentMember(){
         return currentMember.get();
     }
