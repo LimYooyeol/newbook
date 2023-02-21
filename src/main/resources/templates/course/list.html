@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html
+        xmlns:th = "http://www.thymeleaf.org">
+<head th:replace = "fragments/header :: header">
+<body>
+<div class="container">
+    <div th:replace="/fragments/nav.html::nav"></div>
+
+    <div class="row">
+    <div class="col-2" style="background-color: blue;">
+        <h3>카테고리</h3>
+        <ul>
+            <li>개발</li>
+            <li>AI</li>
+        </ul>
+    </div>
+    <div class="col-10" style="background-color:yellow">
+        <div class="row">
+            <div class="col-5" style="background-color: black">
+                <select>
+                    <option>추천순</option>
+                    <option>인기순</option>
+                    <option>최신순</option>
+                </select>
+            </div>
+            <div class="col-7" style="background-color: grey">
+                <button style="float:right">검색</button>
+                <input type="text" style="float:right">
+            </div>
+        </div>
+        <div class="row" style="justify-content:center;">
+            <div class="row" style="width:88%">
+                <th:block th:if ="${recentCourses}">
+                        <div th:each="course : {recentCourses}">
+                            <div class="card" style="width: 18rem;">
+                                <img class="card-img-top" src="..." alt="Card image cap">
+                                <div class="card-body">
+                                    <h5 class="card-title">Card title</h5>
+                                    <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
+                                    <a href="#" class="btn btn-primary">Go somewhere</a>
+                                </div>
+                            </div>
+                        </div>
+                    </th:block>
+                <div class="card">
+                        <img class="card-img-top" src="/image/temp_image.PNG" alt="Card image cap">
+                        <div class="card-body">
+                            <h5 class="card-title">
+                                임시 게시물 만들기(1)
+                            </h5>
+                            <p class="card-text">홍길동</p>
+                            <a href="#" class="btn btn-primary">Go somewhere</a>
+                        </div>
+                </div>
+                <div class="card">
+                        <img class="card-img-top" src="/image/temp_image.PNG" alt="Card image cap">
+                        <div class="card-body">
+                            <h5 class="card-title">
+                                임시 게시물 넣어놓기(2) - no tf
+                            </h5>
+                            <p class="card-text">이상한 개발자 이름 엄청 긴 개발자 이름</p>
+                            <a href="#" class="btn btn-primary">Go somewhere</a>
+                        </div>
+                    </div>
+                <div class="card">
+                        <img class="card-img-top" src="/image/temp_image.PNG" alt="Card image cap">
+                        <div class="card-body">
+                            <h5 class="card-title">
+                                임시 게시물 넣어놓기(2) - no tf
+                            </h5>
+                            <p class="card-text">이상한 개발자 이름 엄청 긴 개발자 이름</p>
+                            <a href="#" class="btn btn-primary">Go somewhere</a>
+                        </div>
+                    </div>
+                <div class="card">
+                        <img class="card-img-top" src="/image/temp_image.PNG" alt="Card image cap">
+                        <div class="card-body">
+                            <h5 class="card-title">
+                                임시 게시물 넣어놓기(2) - no tf
+                            </h5>
+                            <p class="card-text">이상한 개발자 이름 엄청 긴 개발자 이름</p>
+                            <a href="#" class="btn btn-primary">Go somewhere</a>
+                        </div>
+                    </div>
+            </div>
+        </div>
+        <div class="row" style="justify-content:center">
+            1 2 3 4
+        </div>
+        </div>
+    </div>
+    </div>
+</div>
+</body>
+</html>

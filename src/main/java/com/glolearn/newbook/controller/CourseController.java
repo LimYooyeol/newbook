@@ -60,5 +60,11 @@ public class CourseController {
         return "redirect:/";
     }
 
+    @GetMapping("/course/list")
+    public String list(){
+
+        return "/course/list";
+    }
+
 
 }
