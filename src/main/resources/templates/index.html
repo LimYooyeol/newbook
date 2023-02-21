@@ -1,19 +1,86 @@
 <!DOCTYPE html>
 <html
         xmlns:th = "http://www.thymeleaf.org">
-<head>
-    <meta charset="UTF-8">
-    <title>글로런</title>
-    <link rel="stylesheet" href="/css/bootstrap.css">
-</head>
+<head th:replace = "fragments/header :: header">
 <body>
-    <div th:replace="/fragments/nav.html::nav"></div>
-    <span>index page</span>
+    <div class="container">
+        <div th:replace="/fragments/nav.html::nav"></div>
+        <div class="row">
+            <h2>인기 강의</h2>
+        </div>
+
+        <div class="row">
+            <th:block th:if ="${recentCourses}">
+                <div th:each="course : {recentCourses}">
+                    <div class="card" style="width: 18rem;">
+                        <img class="card-img-top" src="..." alt="Card image cap">
+                        <div class="card-body">
+                            <h5 class="card-title">Card title</h5>
+                            <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
+                            <a href="#" class="btn btn-primary">Go somewhere</a>
+                        </div>
+                    </div>
+                </div>
+            </th:block>
+            <div class="card">
+                <img class="card-img-top" src="/image/temp_image.PNG" alt="Card image cap">
+                <div class="card-body">
+                    <h5 class="card-title">
+                        임시 게시물 만들기(1)
+                    </h5>
+                    <p class="card-text">홍길동</p>
+                    <a href="#" class="btn btn-primary">Go somewhere</a>
+                </div>
+            </div>
+            <div class="card">
+                <img class="card-img-top" src="/image/temp_image.PNG" alt="Card image cap">
+                <div class="card-body">
+                    <h5 class="card-title">
+                        임시 게시물 넣어놓기(2) - no tf
+                    </h5>
+                    <p class="card-text">이상한 개발자 이름 엄청 긴 개발자 이름</p>
+                    <a href="#" class="btn btn-primary">Go somewhere</a>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+<!--    <a href="/course/register">강의등록</a>-->
 </body>
 <style>
-    .navbar-brand{
-        font-weight:bold;
-        font-size:1.5em;
+    .card{
+        width: 15em;
+        height: 20em;
     }
+
+    .card-title{
+        height: 2.5em;
+        overflow:hidden;
+        text-overflow: ellipsis;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+    }
+    .card-text{
+        height: 1.5em;
+        overflow:hidden;
+        text-overflow: ellipsis;
+        display: -webkit-box;
+        -webkit-line-clamp: 1;
+        -webkit-box-orient: vertical;
+    }
+
+    .
 </style>
+<script>
+    function temp1(){
+        alert(1)
+    }
+    function temp2(){
+        const url = new URL(document.location.href)
+
+        document.location.href = '/login?from=' + url.pathname
+    }
+</script>
 </html>

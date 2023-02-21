@@ -6,8 +6,11 @@ import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.SignatureException;
 import io.jsonwebtoken.impl.crypto.JwtSignatureValidator;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.ResponseCookie;
 import org.springframework.stereotype.Component;
 
+import javax.servlet.http.HttpServletResponse;
 import java.util.Date;
 import java.util.UUID;
 
@@ -47,6 +50,12 @@ public class JwtUtils {
                 .compact();
     }
 
+    /*
+        #shorts :
+            Token 에서 사용자 ID 추출
+        #warning:
+            유효성 검사 후 호출하는 것이 안전
+     */
     public Long getSub(String accessToken){
         try{
             return Long.parseLong(Jwts.parser().setSigningKey(secretKey)
@@ -57,6 +66,12 @@ public class JwtUtils {
         }
     }
 
+    /*
+        #shorts :
+            Token 에서 토큰 ID 추출
+        #warning:
+            유효성 검사 후 호출하는 것이 안전
+     */
     public String getRefreshTokenId(String refreshToken){
         try{
             return Jwts.parser().setSigningKey(secretKey)
@@ -82,5 +97,23 @@ public class JwtUtils {
         }
 
         return true;
+    }
+
+    /*
+        #shorts :
+            HttpServletResponse 에 access token 과 refresh token 을 HttpOnlyCookie 로 담아줌
+     */
+    public void issueAccessTokenAndRefreshToken(HttpServletResponse response,
+                                                String userAccessToken,
+                                                String userRefreshToken) {
+        response.setStatus(HttpServletResponse.SC_OK);
+        ResponseCookie accessTokenCookie = ResponseCookie.from("access_token", userAccessToken)
+                .path("/").httpOnly(true).maxAge(ACCESS_TOKEN_LIFESPAN_SEC)
+                .sameSite("lax").build();
+        ResponseCookie refreshTokenCookie = ResponseCookie.from("refresh_token", userRefreshToken)
+                .path("/").httpOnly(true).maxAge(REFRESH_TOKEN_LIFESPAN_SEC)
+                .sameSite("lax").build();
+        response.addHeader(HttpHeaders.SET_COOKIE, accessTokenCookie.toString());
+        response.addHeader(HttpHeaders.SET_COOKIE, refreshTokenCookie.toString());
     }
 }

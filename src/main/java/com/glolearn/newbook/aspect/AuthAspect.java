@@ -1,19 +1,22 @@
 package com.glolearn.newbook.aspect;
 
 import com.glolearn.newbook.context.UserContext;
-import com.glolearn.newbook.domain.RefreshToken;
-import com.glolearn.newbook.repository.RefreshTokenRepository;
+import com.glolearn.newbook.domain.AuthInfo;
+import com.glolearn.newbook.domain.Member;
+import com.glolearn.newbook.repository.AuthInfoRepository;
 import com.glolearn.newbook.service.AuthService;
+import com.glolearn.newbook.service.MemberService;
 import com.glolearn.newbook.utils.JwtUtils;
 import lombok.RequiredArgsConstructor;
 import org.aspectj.lang.annotation.After;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Before;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.ResponseCookie;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
+import org.springframework.ui.Model;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
+import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.util.WebUtils;
 
 import javax.servlet.http.Cookie;
@@ -26,7 +29,7 @@ import javax.servlet.http.HttpServletResponse;
 public class AuthAspect {
     private final JwtUtils jwtUtils;
 
-    private final RefreshTokenRepository refreshTokenRepository;
+    private final AuthInfoRepository authInfoRepository;
     private final AuthService authService;
 
 
@@ -41,6 +44,7 @@ public class AuthAspect {
         HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest();
 
         Cookie accessTokenCookie = WebUtils.getCookie(request, "access_token");
+
         String accessToken = (accessTokenCookie == null)? null : accessTokenCookie.getValue();
 
         Cookie refreshTokenCookie = WebUtils.getCookie(request, "refresh_token");
@@ -53,7 +57,7 @@ public class AuthAspect {
             UserContext.setReissueFlag(false);
         }else if(jwtUtils.validate(refreshToken)){
             // refresh token 으로 인증
-            RefreshToken findAuth = refreshTokenRepository.findByTokenId(jwtUtils.getRefreshTokenId(refreshToken));
+            AuthInfo findAuth = authInfoRepository.findByTokenId(jwtUtils.getRefreshTokenId(refreshToken));
             if(findAuth != null){   // refresh token 으로 서버인증까지 성공한 경우
                 UserContext.setCurrentMember(findAuth.getMember().getId());
                 UserContext.setReissueFlag(true);
@@ -62,6 +66,7 @@ public class AuthAspect {
             UserContext.setUnAuthorized();
             UserContext.setReissueFlag(false);
         }
+
     }
 
     /*
@@ -73,7 +78,6 @@ public class AuthAspect {
     public void endAuthorization(){
         HttpServletResponse response = ((ServletRequestAttributes)RequestContextHolder.getRequestAttributes()).getResponse();
 
-
         Long memberId = UserContext.getCurrentMember();
 
         // refresh token 으로 인증한 경우 -> 토큰 재발행
@@ -82,17 +86,7 @@ public class AuthAspect {
             String userAccessToken = jwtUtils.createAccessToken(memberId);
             String userRefreshToken = authService.addAuthorization(memberId);
 
-            HttpHeaders headers = new HttpHeaders();
-
-            ResponseCookie newAccessTokenCookie = ResponseCookie.from("access_token", userAccessToken)
-                    .path("/").httpOnly(true).maxAge(jwtUtils.ACCESS_TOKEN_LIFESPAN_SEC)
-                    .sameSite("strict").build();
-            ResponseCookie newRefreshTokenCookie = ResponseCookie.from("refresh_token", userRefreshToken)
-                    .path("/").httpOnly(true).maxAge(jwtUtils.REFRESH_TOKEN_LIFESPAN_SEC)
-                    .sameSite("strict").build();
-
-            response.addHeader(HttpHeaders.SET_COOKIE, newAccessTokenCookie.toString());
-            response.addHeader(HttpHeaders.SET_COOKIE, newRefreshTokenCookie.toString());
+            jwtUtils.issueAccessTokenAndRefreshToken(response, userAccessToken, userRefreshToken);
         }
 
         UserContext.clear();

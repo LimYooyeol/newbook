@@ -1,12 +1,13 @@
 package com.glolearn.newbook.service;
 
+import com.glolearn.newbook.domain.AuthInfo;
 import com.glolearn.newbook.domain.Member;
 import com.glolearn.newbook.domain.OAuthDomain;
-import com.glolearn.newbook.domain.RefreshToken;
-import com.glolearn.newbook.repository.RefreshTokenRepository;
+import com.glolearn.newbook.repository.AuthInfoRepository;
 import com.glolearn.newbook.repository.MemberRepository;
 import com.glolearn.newbook.utils.JwtUtils;
 import lombok.RequiredArgsConstructor;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -18,7 +19,7 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class AuthService {
     private final MemberRepository memberRepository;
-    private final RefreshTokenRepository refreshTokenRepository;
+    private final AuthInfoRepository authInfoRepository;
     private final JwtUtils jwtUtils;
 
     /*
@@ -27,11 +28,23 @@ public class AuthService {
      */
     @Transactional
     public void addMember(Member member){
+        if(member == null){
+            return;
+        }
         memberRepository.save(member);
     }
 
+    /*
+        #return:
+            없으면 -> null
+            있으면 -> Member 객체
+     */
     @Transactional(readOnly = true)
     public Member findOAuthMember(String oAuthId, OAuthDomain oAuthDomain){
+        if(oAuthId == null || oAuthDomain == null){
+            return null;
+        }
+
         return memberRepository.findByOAuthIdAndOAuthDomain(oAuthId, oAuthDomain);
     }
 
@@ -48,8 +61,8 @@ public class AuthService {
 
         String refreshToken = jwtUtils.createRefreshToken(refreshTokenId);
         Date expires = new Date(new Date().getTime() + jwtUtils.REFRESH_TOKEN_LIFESPAN_MILLI);
-        RefreshToken authInfo = RefreshToken.createRefreshToken(refreshTokenId, member, expires.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime());
-        refreshTokenRepository.save(authInfo);
+        AuthInfo authInfo = AuthInfo.createAuthInfo(refreshTokenId, member, expires.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime());
+        authInfoRepository.save(authInfo);
 
         return refreshToken;
     }
@@ -61,6 +74,14 @@ public class AuthService {
         }
 
         String refreshTokenId = jwtUtils.getRefreshTokenId(refreshToken);
-        refreshTokenRepository.deleteById(refreshTokenId);
+        if(refreshTokenId == null){ // RefreshToken 이 유효하지 않은 경우
+            return;
+        }
+
+        try{
+            authInfoRepository.deleteById(refreshTokenId);
+        }catch(EmptyResultDataAccessException e){
+            return;
+        }
     }
 }

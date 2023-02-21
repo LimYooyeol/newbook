@@ -26,10 +26,6 @@ public class AuthController {
 
     private final JwtUtils jwtUtils;
 
-    /*
-        #to do:
-            이미 로그인 되어 있는 경우 처리
-     */
     @GetMapping("/login")
     public String login(){
         return "login";
@@ -37,7 +33,7 @@ public class AuthController {
 
     /*
         #shorts:
-            로그아웃 -> token 만료
+            로그아웃 (token 만료 + DB refresh token 제거)
      */
     @DeleteMapping("/oauth/token")
     public String logout(
@@ -65,13 +61,13 @@ public class AuthController {
             OAuth 인증 시 access code 를 들고 redirect 되는 엔드 포인트.
             글로런 서비스 이용을 위한 access token 및 refresh token 발급
         #to do  :
-            인증 실패 경우에 따른 예외처리 세분화
-            이동하려던 페이지로 redirect 하기 (현재는 전부 index)
+            인증 실패 경우 시 예외처리 세분화
      */
     @GetMapping("/oauth/{provider}/token")
     public String oauth(
             @PathVariable("provider") String provider,
             @RequestParam(name = "code") String accessCode,
+            @RequestParam(name = "state", defaultValue = "/") String redirectPath,
             HttpServletResponse response
     ){
         OAuthProvider oAuthProvider;
@@ -95,7 +91,6 @@ public class AuthController {
             oAuthAccessToken = oAuthProvider.getAccessToken(accessCode);
             oAuthId = oAuthProvider.getOAuthId(oAuthAccessToken);
         }catch(Exception e){   // resource server 로부터 resource owner 정보를 불러오는 것에 실패한 경우
-            System.out.println(e.getMessage());
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED);
         }
 
@@ -114,18 +109,8 @@ public class AuthController {
         String userRefreshToken = authService.addAuthorization(member.getId());
 
         // 5. 쿠키 발급
-        response.setStatus(HttpServletResponse.SC_OK);
-
-        ResponseCookie accessTokenCookie = ResponseCookie.from("access_token", userAccessToken)
-                .path("/").httpOnly(true).maxAge(jwtUtils.ACCESS_TOKEN_LIFESPAN_SEC)
-                .sameSite("strict").build();
-        ResponseCookie refreshTokenCookie = ResponseCookie.from("refresh_token", userRefreshToken)
-                .path("/").httpOnly(true).maxAge(jwtUtils.REFRESH_TOKEN_LIFESPAN_SEC)
-                .sameSite("strict").build();
-        response.addHeader(HttpHeaders.SET_COOKIE, accessTokenCookie.toString());
-        response.addHeader(HttpHeaders.SET_COOKIE, refreshTokenCookie.toString());
-
-        return "redirect:/";
+        jwtUtils.issueAccessTokenAndRefreshToken(response, userAccessToken, userRefreshToken);
+        return "redirect:" + redirectPath;
     }
 
 }

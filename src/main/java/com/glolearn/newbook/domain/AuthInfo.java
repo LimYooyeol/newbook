@@ -4,12 +4,11 @@ import com.sun.istack.NotNull;
 import lombok.Getter;
 
 import javax.persistence.*;
-import javax.validation.constraints.Size;
 import java.time.LocalDateTime;
 
 @Entity
 @Getter
-public class RefreshToken {
+public class AuthInfo {
     @Id
     private String tokenId;
 
@@ -20,13 +19,13 @@ public class RefreshToken {
     @NotNull
     private LocalDateTime expireDate;
 
-    public static RefreshToken createRefreshToken(String tokenId, Member member, LocalDateTime expireDate){
-        RefreshToken refreshToken = new RefreshToken();
-        refreshToken.tokenId = tokenId;
-        refreshToken.member = member;
-        refreshToken.expireDate = expireDate;
+    public static AuthInfo createAuthInfo(String tokenId, Member member, LocalDateTime expireDate){
+        AuthInfo authInfo = new AuthInfo();
+        authInfo.tokenId = tokenId;
+        authInfo.member = member;
+        authInfo.expireDate = expireDate;
 
-        return refreshToken;
+        return authInfo;
     }
 
 }

@@ -19,7 +19,9 @@ public class MemberRepository {
 
     public void save(Member member) {em.persist(member);}
 
-    public Member findById(Long id) {return em.find(Member.class, id);}
+    public Member findById(Long id) {
+        return em.find(Member.class, id);
+    }
 
     public Member findByOAuthIdAndOAuthDomain(String oAuthId, OAuthDomain oAuthDomain) {
         JPAQueryFactory query = new JPAQueryFactory(em);

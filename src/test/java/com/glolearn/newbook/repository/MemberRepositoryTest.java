@@ -40,4 +40,17 @@ class MemberRepositoryTest {
         // then
         assertNull(member);
     }
+
+    @Test
+    @Transactional
+    public void 회원조회테스트(){
+        // given
+        Member member = Member.createMember("asdf",OAuthDomain.KAKAO, "회원1");
+
+        // when
+        memberRepository.save(member);
+
+        // then
+        assertNotNull(memberRepository.findById(1L));
+    }
 }

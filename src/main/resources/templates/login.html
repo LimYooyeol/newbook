@@ -19,10 +19,16 @@
   function loginWithKakao(){
     Kakao.init('39820925f96876b00bbdc22a850605f9')
 
+    const url = new URL(document.location.href)
+
+    var state = url.searchParams.get('from')
+    if(state == null) { state = '/' }
 
     Kakao.Auth.authorize({
-      redirectUri: 'http://localhost:8080/oauth/kakao/token'
+      redirectUri: 'http://localhost:8080/oauth/kakao/token',
+      state: state
     })
+
   }
 </script>
 <style>

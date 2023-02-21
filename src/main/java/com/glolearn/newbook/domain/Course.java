@@ -2,6 +2,7 @@ package com.glolearn.newbook.domain;
 
 import com.sun.istack.NotNull;
 import lombok.Getter;
+import lombok.Setter;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
@@ -14,7 +15,7 @@ import java.util.List;
 @Getter
 public class Course {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "course_id")
     private Long id;
 
@@ -45,4 +46,19 @@ public class Course {
     // mappedBy 에 들어가는 값은 실제 Lecture class 의 변수 이름
     @OneToMany(mappedBy = "course", fetch = FetchType.LAZY)
     private List<Lecture> lectures = new ArrayList<>();
+
+    public static Course createCourse(Member lecturer, String courseName, String introduction,
+                               Boolean published, Category category, String cover){
+        Course course = new Course();
+        course.lecturer = lecturer;
+        course.courseName = courseName;
+        course.regDate = LocalDateTime.now();
+        course.published = published;
+        course.introduction = introduction;
+        course.category = category;
+        course.cover = cover;
+
+        return course;
+    }
+
 }

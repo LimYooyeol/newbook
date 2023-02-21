@@ -11,6 +11,9 @@ public class MemberService {
     private final MemberRepository memberRepository;
 
     public Member findMember(Long id) {
+        if(id == null){
+            return null;
+        }
         return memberRepository.findById(id);
     }
 }
