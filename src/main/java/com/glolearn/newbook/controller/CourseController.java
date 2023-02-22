@@ -15,6 +15,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.stereotype.Repository;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -61,10 +62,34 @@ public class CourseController {
     }
 
     @GetMapping("/course/list")
+    @Auth
     public String list(){
+        // 0. 비로그인 처리
+        Member member = memberService.findMember(UserContext.getCurrentMember());
+        if(member == null){throw new ResponseStatusException(HttpStatus.UNAUTHORIZED);}
 
         return "/course/list";
     }
 
+    @GetMapping("/lecturer")
+    @Auth
+    public String lecturer(Model model){
+        // 0. 비로그인 처리
+        Member member = memberService.findMember(UserContext.getCurrentMember());
+        if(member != null){model.addAttribute("nickname", member.getNickname());}
+
+        return "/lecturer/course/list";
+    }
+
+    @GetMapping("/lecturer/course/{id}")
+    @Auth
+    public String manageLecture(Model model,
+                                @PathVariable(name = "id") Long id){
+        // 0. 비로그인 처리
+        Member member = memberService.findMember(UserContext.getCurrentMember());
+        if(member != null){model.addAttribute("nickname", member.getNickname());}
+
+        return "/lecturer/course/manage";
+    }
 
 }

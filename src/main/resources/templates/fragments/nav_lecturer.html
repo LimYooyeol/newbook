@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html
+        xmlns:th = "http://www.thymeleaf.org">
+<div th:fragment="nav">
+  <nav style="padding-top : 1%;"
+       class="navbar navbar-expand-lg navbar-light bg-white">
+    <a style="font-weight: bold; font-size:1.5em;"
+       class="navbar-brand" href="/lecturer">GLL 글로런.작가</a>
+
+    <div class="collapse navbar-collapse" id="navbarTogglerDemo03">
+      <ul class="navbar-nav mr-auto mt-2 mt-lg-0">
+        <li class="nav-item">
+          <a class="nav-link" href="/lecturer/statistics">통계</a>
+        </li>
+      </ul>
+      <ul class="navbar-nav my-2 my-sm-0">
+        <li class="nav-item active">
+          <a th:if="${nickname == null}" class="nav-link" href="/login">로그인</a>
+        </li>
+        <li th:if="${nickname}" class="nav-item dropdown">
+          <a th:value = "${nickname}" class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            <i class="bi bi-person-circle"></i>
+          </a>
+          <div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdown">
+            <p class="dropdown-item" th:text = "${nickname} + 님"></p>
+            <a class="dropdown-item" href="#">마이 페이지</a>
+            <a class="dropdown-item" href="/">학생 전환</a>
+            <div class="dropdown-divider"></div>
+            <form id = "logoutForm" action="/oauth/token" th:method="DELETE" style="text-align:center;">
+              <button type="submit" style="background:none; border: none; cursor: pointer">로그아웃</button>
+            </form>
+          </div>
+        </li>
+      </ul>
+    </div>
+  </nav>
+  <hr>
+  <div>
+</html>

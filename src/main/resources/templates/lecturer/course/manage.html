@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html
+        xmlns:th = "http://www.thymeleaf.org">
+<head th:replace = "fragments/header :: header">
+<body>
+<div class="container">
+    <div th:replace = "fragments/nav_lecturer::nav"></div>
+    <div class="row">
+        <div class="col">
+            <h3>{title}</h3>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col">
+            <button style="float:right;">삭제</button>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col">
+            <ul class="nav nav-tabs">
+                <li class="nav-item">
+                    <a class="nav-link active" id="tab0" onclick="changeTab(0)">정보</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" id="tab1" onclick="changeTab(1)">목차</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+    <div class="row">
+        <div id="display0" class="col">
+            <div class="row">
+                <div class="col">
+                    <button style="float:right;">수정</button>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col">
+                    <h3>제목</h3>
+                    <h3>{title}</h3><br>
+                    <h3>커버</h3>
+                    <div style="width: 12em; height: 9em; border: 1px solid; display: flex;
+                            align-items: center;">
+                        <div style="width:100%; text-align: center;">
+                            커버 이미지
+                        </div>
+                    </div><br>
+                    <h3>소개</h3>
+                    <div>
+                        소개소개소개소
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="display1" class="col" style="display:none;">
+            div2
+        </div>
+    </div>
+</div>
+</body>
+<script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
+<script src="/javascripts/bootstrap.js"></script>
+<script>
+    function changeTab(option){
+        var showTab = document.getElementById('tab' + option)
+        var hideTab = document.getElementById('tab' + (option + 1)%2)
+
+        showTab.classList.remove('nav-link')
+        showTab.classList.add('nav-link')
+        showTab.classList.add('active')
+
+        hideTab.classList.remove('active')
+
+
+        var display = document.getElementById('display' + option)
+        var hide = document.getElementById('display' + (option + 1)%2)
+
+        hide.style.display = 'none'
+        display.style.display = 'unset'
+
+    }
+</script>
+</html>

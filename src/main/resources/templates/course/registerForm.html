@@ -5,26 +5,77 @@
 <head>
 </head>
 <body>
-    <div th:replace="/fragments/nav.html::nav"></div>
-    <!--    #to do: -->
-    <!--        이미지 입력 처리하기 -->
-    <form id = "registerForm" action="/course/register" th:object="${courseRegisterDto}" method="post">
-        <input type="file" accept="image/*" onchange="func(this)">
-        <input th:field="*{cover}" type="text" placeholder="임시 cover 주소">
-        <input th:field="*{courseName}" type="text" placeholder="제목을 입력하세요.">
-        <input th:field="*{published}" type="checkbox">바로 공개하기
-        <input th:field="*{introduction}" type="hidden">
-
-        <select th:field="*{category}">
-            <option th:each="category : ${T(com.glolearn.newbook.domain.Category).values()}"
-                th:text = "${category.getValue()}"
-                th:value = "${category.name()}">
-            </option>
-        </select>
-
-        <div id = "editor"></div>
-        <button type="button" onclick="register()">등록</button>
+<div class="container">
+    <div th:replace="/fragments/nav_lecturer.html::nav"></div>
+    <form>
+        <div class="row">
+            <div class="col">
+                <h3>제목</h3>
+                <input type="text" placeholder="제목을 입력하세요.">
+            </div>
+        </div>
+        <div class="row">
+            <div class="col">
+                <h3>커버 이미지</h3>
+                <div style="width: 12em; height: 9em; border: 1px solid; display: flex;
+                            align-items: center;">
+                    <div style="width:100%; text-align: center;">
+                        커버 이미지 선택
+                    </div>
+                </div>
+                <input type="file" accept="image/*">
+            </div>
+        </div>
+        <div class="row">
+            <div class="col">
+                <h3>소개</h3>
+                <div id = "editor"></div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col">
+                <h3>카테고리</h3>
+                <select>
+                    <option value="0">개발</option>
+                    <option value="0">AI</option>
+                </select>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col">
+                <h3>출시여부</h3>
+                <input type="radio" name="rad">
+                <input type="radio" name="rad">
+            </div>
+        </div>
+        <div class="row">
+            <div class="col">
+                <button class="btn btn-primary" type="submit" style="float:right;">제출하기</button>
+            </div>
+        </div>
     </form>
+
+
+</div>
+
+
+<!--    <form id = "registerForm" action="/course/register" th:object="${courseRegisterDto}" method="post">-->
+<!--        <input type="file" accept="image/*" onchange="func(this)">-->
+<!--        <input th:field="*{cover}" type="text" placeholder="임시 cover 주소">-->
+<!--        <input th:field="*{courseName}" type="text" placeholder="제목을 입력하세요.">-->
+<!--        <input th:field="*{published}" type="checkbox">바로 공개하기-->
+<!--        <input th:field="*{introduction}" type="hidden">-->
+
+<!--        <select th:field="*{category}">-->
+<!--            <option th:each="category : ${T(com.glolearn.newbook.domain.Category).values()}"-->
+<!--                th:text = "${category.getValue()}"-->
+<!--                th:value = "${category.name()}">-->
+<!--            </option>-->
+<!--        </select>-->
+
+<!--        <div id = "editor"></div>-->
+<!--        <button type="button" onclick="register()">등록</button>-->
+<!--    </form>-->
 </body>
 <script src="https://uicdn.toast.com/editor/latest/toastui-editor-all.min.js"></script>
 <script>
