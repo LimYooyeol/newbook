@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html
+        xmlns:th = "http://www.thymeleaf.org">
+<head th:replace = "fragments/header :: header">
+<body>
+<div class="container">
+    <div th:replace = "fragments/nav::nav"></div>
+    <div class="row" style="display:flex;">
+        <div class="col-5" style="width:400px; height:300px;">
+            <img src="/image/temp_image.PNG" style = "width:100%; height:100%;">
+        </div>
+        <div class="col-7" style="background-color:green;">
+            ㅎㅇ2
+        </div>
+    </div>
+    <div class="row">
+        <div class="col">
+            <ul class="nav nav-tabs">
+                <li class="nav-item">
+                    <a class="nav-link active" id="tab0" onclick="changeTab(0)">소개</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" id="tab1" onclick="changeTab(1)">목차</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+    <div class="row">
+        <div id="display0" class="col">
+            <div class="row">
+                <div class="col">
+                    <div>
+                        소개소개소개소개ㅎ
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="display1" class="col" style="display:none;">
+            <ul class="list-group">
+                <li class="list-group-item">
+                    1. 자바 설치하기
+                    <button style="float:right;">보기</button>
+                </li>
+                <li class="list-group-item">
+                    2. 변수란?
+                    <button style="float:right;">보기</button>
+                </li>
+            </ul>
+        </div>
+
+    </div>
+</div>
+</body>
+<script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
+<script src="/javascripts/bootstrap.js"></script>
+<script>
+    function changeTab(option){
+        var showTab = document.getElementById('tab' + option)
+        var hideTab = document.getElementById('tab' + (option + 1)%2)
+
+        showTab.classList.remove('nav-link')
+        showTab.classList.add('nav-link')
+        showTab.classList.add('active')
+
+        hideTab.classList.remove('active')
+
+
+        var display = document.getElementById('display' + option)
+        var hide = document.getElementById('display' + (option + 1)%2)
+
+        hide.style.display = 'none'
+        display.style.display = 'unset'
+
+    }
+</script>
+</html>
