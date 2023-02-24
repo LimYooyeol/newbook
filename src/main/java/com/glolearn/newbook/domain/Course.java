@@ -26,7 +26,7 @@ public class Course {
 
     @NotBlank
     @Size(min = 2, max = 100)
-    private String courseName;
+    private String title;
 
     private LocalDateTime regDate;
 
@@ -41,17 +41,20 @@ public class Course {
     private String cover;
 
     @OneToMany(mappedBy = "course", fetch = FetchType.LAZY)
-    private List<Enrollment> enrollments = new ArrayList<>();
+    private List<Enrollment> enrollmentList = new ArrayList<>();
 
     // mappedBy 에 들어가는 값은 실제 Lecture class 의 변수 이름
     @OneToMany(mappedBy = "course", fetch = FetchType.LAZY)
-    private List<Lecture> lectures = new ArrayList<>();
+    private List<Lecture> lectureList = new ArrayList<>();
 
-    public static Course createCourse(Member lecturer, String courseName, String introduction,
+    @NotNull
+    private Long numStudent;
+
+    public static Course createCourse(Member lecturer, String title, String introduction,
                                Boolean published, Category category, String cover){
         Course course = new Course();
         course.lecturer = lecturer;
-        course.courseName = courseName;
+        course.title = title;
         course.regDate = LocalDateTime.now();
         course.published = published;
         course.introduction = introduction;
@@ -60,5 +63,4 @@ public class Course {
 
         return course;
     }
-
 }
