@@ -2,14 +2,11 @@ package com.glolearn.newbook.domain;
 
 import com.sun.istack.NotNull;
 import lombok.Getter;
-import lombok.Setter;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
 
 @Entity
 @Getter
@@ -32,7 +29,7 @@ public class Course {
 
     private String introduction;
 
-    private Boolean published;      // [0: false, 1: true]
+    private Boolean isPublished;
 
     @Enumerated(EnumType.STRING)
     private Category category;
@@ -40,23 +37,16 @@ public class Course {
     @NotNull
     private String cover;
 
-    @OneToMany(mappedBy = "course", fetch = FetchType.LAZY)
-    private List<Enrollment> enrollmentList = new ArrayList<>();
-
-    // mappedBy 에 들어가는 값은 실제 Lecture class 의 변수 이름
-    @OneToMany(mappedBy = "course", fetch = FetchType.LAZY)
-    private List<Lecture> lectureList = new ArrayList<>();
-
     @NotNull
     private Long numStudent;
 
     public static Course createCourse(Member lecturer, String title, String introduction,
-                               Boolean published, Category category, String cover){
+                               Boolean isPublished, Category category, String cover){
         Course course = new Course();
         course.lecturer = lecturer;
         course.title = title;
         course.regDate = LocalDateTime.now();
-        course.published = published;
+        course.isPublished = isPublished;
         course.introduction = introduction;
         course.category = category;
         course.cover = cover;

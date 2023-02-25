@@ -1,5 +1,6 @@
-package com.glolearn.newbook.domain;
+package com.glolearn.newbook.domain.Auth;
 
+import com.glolearn.newbook.domain.Member;
 import com.sun.istack.NotNull;
 import lombok.Getter;
 

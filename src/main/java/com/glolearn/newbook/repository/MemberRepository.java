@@ -1,7 +1,7 @@
 package com.glolearn.newbook.repository;
 
 import com.glolearn.newbook.domain.Member;
-import com.glolearn.newbook.domain.OAuthDomain;
+import com.glolearn.newbook.domain.Auth.OauthDomain;
 import com.glolearn.newbook.domain.QMember;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
@@ -23,7 +23,7 @@ public class MemberRepository {
         return em.find(Member.class, id);
     }
 
-    public Member findByOAuthIdAndOAuthDomain(String oAuthId, OAuthDomain oAuthDomain) {
+    public Member findByOAuthIdAndOAuthDomain(String oAuthId, OauthDomain oAuthDomain) {
         JPAQueryFactory query = new JPAQueryFactory(em);
         QMember qMember = QMember.member;
 

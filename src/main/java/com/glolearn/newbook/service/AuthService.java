@@ -1,8 +1,8 @@
 package com.glolearn.newbook.service;
 
-import com.glolearn.newbook.domain.AuthInfo;
+import com.glolearn.newbook.domain.Auth.AuthInfo;
 import com.glolearn.newbook.domain.Member;
-import com.glolearn.newbook.domain.OAuthDomain;
+import com.glolearn.newbook.domain.Auth.OauthDomain;
 import com.glolearn.newbook.repository.AuthInfoRepository;
 import com.glolearn.newbook.repository.MemberRepository;
 import com.glolearn.newbook.utils.JwtUtils;
@@ -40,7 +40,7 @@ public class AuthService {
             있으면 -> Member 객체
      */
     @Transactional(readOnly = true)
-    public Member findOAuthMember(String oAuthId, OAuthDomain oAuthDomain){
+    public Member findOAuthMember(String oAuthId, OauthDomain oAuthDomain){
         if(oAuthId == null || oAuthDomain == null){
             return null;
         }

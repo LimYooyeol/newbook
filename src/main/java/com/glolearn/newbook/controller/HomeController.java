@@ -4,6 +4,7 @@ package com.glolearn.newbook.controller;
 import com.glolearn.newbook.annotation.Auth;
 import com.glolearn.newbook.context.UserContext;
 import com.glolearn.newbook.domain.Member;
+import com.glolearn.newbook.service.CourseService;
 import com.glolearn.newbook.service.MemberService;
 import lombok.RequiredArgsConstructor;
 import org.apache.catalina.User;
@@ -15,6 +16,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 @RequiredArgsConstructor
 public class HomeController {
     private final MemberService memberService;
+    private final CourseService courseService;
 
     @GetMapping("/")
     @Auth
@@ -24,6 +26,8 @@ public class HomeController {
         if(member != null){
             model.addAttribute("nickname", member.getNickname());
         }
+
+
 
         return "index";
     }
