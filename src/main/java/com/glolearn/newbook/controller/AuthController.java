@@ -1,9 +1,9 @@
 package com.glolearn.newbook.controller;
 
+import com.glolearn.newbook.domain.Auth.OauthDomain;
 import com.glolearn.newbook.domain.Member;
-import com.glolearn.newbook.domain.OAuthDomain;
-import com.glolearn.newbook.oauth.KakaoOAuthProvider;
-import com.glolearn.newbook.oauth.OAuthProvider;
+import com.glolearn.newbook.oauth.KakaoOauthProvider;
+import com.glolearn.newbook.oauth.OauthProvider;
 import com.glolearn.newbook.service.AuthService;
 import com.glolearn.newbook.utils.JwtUtils;
 import lombok.RequiredArgsConstructor;
@@ -22,7 +22,7 @@ import javax.servlet.http.HttpServletResponse;
 public class AuthController {
     private final AuthService authService;
 
-    private final KakaoOAuthProvider kakaoOAuthProvider;
+    private final KakaoOauthProvider kakaoOauthProvider;
 
     private final JwtUtils jwtUtils;
 
@@ -70,13 +70,13 @@ public class AuthController {
             @RequestParam(name = "state", defaultValue = "/") String redirectPath,
             HttpServletResponse response
     ){
-        OAuthProvider oAuthProvider;
-        OAuthDomain oAuthDomain;
+        OauthProvider oAuthProvider;
+        OauthDomain oAuthDomain;
 
         switch (provider){
             case "kakao" :
-                oAuthProvider = kakaoOAuthProvider;
-                oAuthDomain = OAuthDomain.KAKAO;
+                oAuthProvider = kakaoOauthProvider;
+                oAuthDomain = OauthDomain.KAKAO;
                 break;
             default:
                 throw new ResponseStatusException(HttpStatus.NOT_FOUND);
@@ -100,7 +100,7 @@ public class AuthController {
         // 3. 회원조회 (새로운 회원이라면 추가)
         Member member = authService.findOAuthMember(oAuthId, oAuthDomain);
         if(member == null){
-            member = Member.createMember(oAuthId, OAuthDomain.KAKAO, provider + oAuthId);
+            member = Member.createMember(oAuthId, OauthDomain.KAKAO, provider + oAuthId);
             authService.addMember(member); // 동시 첫 로그인 확률 매우 낮음 + unique constraint(oauth_id, oauth_domain) 를 안걸어둬서 문제 없음.
         }
 

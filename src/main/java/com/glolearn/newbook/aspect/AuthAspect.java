@@ -1,27 +1,23 @@
 package com.glolearn.newbook.aspect;
 
 import com.glolearn.newbook.context.UserContext;
-import com.glolearn.newbook.domain.AuthInfo;
-import com.glolearn.newbook.domain.Member;
+import com.glolearn.newbook.domain.Auth.AuthInfo;
 import com.glolearn.newbook.repository.AuthInfoRepository;
 import com.glolearn.newbook.service.AuthService;
-import com.glolearn.newbook.service.MemberService;
 import com.glolearn.newbook.utils.JwtUtils;
 import lombok.RequiredArgsConstructor;
 import org.aspectj.lang.annotation.After;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Before;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
-import org.springframework.ui.Model;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
-import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.util.WebUtils;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.util.Optional;
 
 @Aspect
 @Component
@@ -57,10 +53,14 @@ public class AuthAspect {
             UserContext.setReissueFlag(false);
         }else if(jwtUtils.validate(refreshToken)){
             // refresh token 으로 인증
-            AuthInfo findAuth = authInfoRepository.findByTokenId(jwtUtils.getRefreshTokenId(refreshToken));
-            if(findAuth != null){   // refresh token 으로 서버인증까지 성공한 경우
-                UserContext.setCurrentMember(findAuth.getMember().getId());
+            Optional<AuthInfo> findAuth = authInfoRepository.findById(jwtUtils.getRefreshTokenId(refreshToken));
+
+            if(findAuth.isPresent()){   // refresh token 으로 서버인증까지 성공한 경우
+                UserContext.setCurrentMember(findAuth.get().getMember().getId());
                 UserContext.setReissueFlag(true);
+            }else{
+                UserContext.setUnAuthorized();
+                UserContext.setReissueFlag(false);
             }
         }else{ // 인증 실패
             UserContext.setUnAuthorized();

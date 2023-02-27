@@ -1,6 +1,6 @@
 package com.glolearn.newbook.oauth;
 
-public interface OAuthProvider {
+public interface OauthProvider {
 
     public String getAccessToken(String accessCode) throws Exception;
 

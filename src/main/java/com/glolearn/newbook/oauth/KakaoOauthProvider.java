@@ -9,7 +9,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
 
 @Component
-public class KakaoOAuthProvider implements OAuthProvider {
+public class KakaoOauthProvider implements OauthProvider {
 
     @Override
     public String getAccessToken(String code) throws ParseException, InvalidAccessCodeException {
