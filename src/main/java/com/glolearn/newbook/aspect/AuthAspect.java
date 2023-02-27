@@ -17,6 +17,7 @@ import org.springframework.web.util.WebUtils;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.util.Optional;
 
 @Aspect
 @Component
@@ -52,10 +53,14 @@ public class AuthAspect {
             UserContext.setReissueFlag(false);
         }else if(jwtUtils.validate(refreshToken)){
             // refresh token 으로 인증
-            AuthInfo findAuth = authInfoRepository.findByTokenId(jwtUtils.getRefreshTokenId(refreshToken));
-            if(findAuth != null){   // refresh token 으로 서버인증까지 성공한 경우
-                UserContext.setCurrentMember(findAuth.getMember().getId());
+            Optional<AuthInfo> findAuth = authInfoRepository.findById(jwtUtils.getRefreshTokenId(refreshToken));
+
+            if(findAuth.isPresent()){   // refresh token 으로 서버인증까지 성공한 경우
+                UserContext.setCurrentMember(findAuth.get().getMember().getId());
                 UserContext.setReissueFlag(true);
+            }else{
+                UserContext.setUnAuthorized();
+                UserContext.setReissueFlag(false);
             }
         }else{ // 인증 실패
             UserContext.setUnAuthorized();

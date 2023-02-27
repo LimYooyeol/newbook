@@ -69,7 +69,21 @@ public class CourseController {
         Member member = memberService.findMember(UserContext.getCurrentMember());
         if(member != null){model.addAttribute("nickname", member.getNickname());}
 
-        return "/course/detail";
+        return "/course/details";
+    }
+
+    @GetMapping("/course/{courseId}/{lectureId}")
+    @Auth
+    public String lectureDetails(
+            @PathVariable(name = "courseId") String courseId,
+            @PathVariable(name = "lectureId") String lectureId,
+            Model model
+    ){
+        // 0. 비로그인 처리
+        Member member = memberService.findMember(UserContext.getCurrentMember());
+        if(member != null){model.addAttribute("nickname", member.getNickname());}
+
+        return "/course/lecture/details";
     }
 
     @GetMapping("/course/list")

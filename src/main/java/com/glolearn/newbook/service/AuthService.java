@@ -45,7 +45,7 @@ public class AuthService {
             return null;
         }
 
-        return memberRepository.findByOAuthIdAndOAuthDomain(oAuthId, oAuthDomain);
+        return memberRepository.findByOauthIdAndOauthDomain(oAuthId, oAuthDomain);
     }
 
     /*

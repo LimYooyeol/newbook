@@ -22,7 +22,7 @@ import javax.servlet.http.HttpServletResponse;
 public class AuthController {
     private final AuthService authService;
 
-    private final KakaoOauthProvider kakaoOAuthProvider;
+    private final KakaoOauthProvider kakaoOauthProvider;
 
     private final JwtUtils jwtUtils;
 
@@ -75,7 +75,7 @@ public class AuthController {
 
         switch (provider){
             case "kakao" :
-                oAuthProvider = kakaoOAuthProvider;
+                oAuthProvider = kakaoOauthProvider;
                 oAuthDomain = OauthDomain.KAKAO;
                 break;
             default:

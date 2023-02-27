@@ -17,19 +17,26 @@ public class MemberRepository {
     private final EntityManager em;
 
 
-    public void save(Member member) {em.persist(member);}
+    public Long save(Member member) {
+        if(member.getId() == null){
+            em.persist(member);
+        }else{
+            em.merge(member);
+        }
+        return member.getId();
+    }
 
     public Member findById(Long id) {
         return em.find(Member.class, id);
     }
 
-    public Member findByOAuthIdAndOAuthDomain(String oAuthId, OauthDomain oAuthDomain) {
+    public Member findByOauthIdAndOauthDomain(String oauthId, OauthDomain oauthDomain) {
         JPAQueryFactory query = new JPAQueryFactory(em);
         QMember qMember = QMember.member;
 
         List<Member> members = query.select(qMember)
-                .where(qMember.oAuthId.eq(oAuthId)
-                        .and(qMember.oAuthDomain.eq(oAuthDomain))
+                .where(qMember.oauthId.eq(oauthId)
+                        .and(qMember.oauthDomain.eq(oauthDomain))
                 ).from(qMember).fetch();
 
         if(members.size() == 0){
