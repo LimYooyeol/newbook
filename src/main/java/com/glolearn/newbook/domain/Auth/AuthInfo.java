@@ -17,16 +17,5 @@ public class AuthInfo {
     @JoinColumn(name = "member_id")
     private Member member;
 
-    @NotNull
     private LocalDateTime expireDate;
-
-    public static AuthInfo createAuthInfo(String tokenId, Member member, LocalDateTime expireDate){
-        AuthInfo authInfo = new AuthInfo();
-        authInfo.tokenId = tokenId;
-        authInfo.member = member;
-        authInfo.expireDate = expireDate;
-
-        return authInfo;
-    }
-
 }

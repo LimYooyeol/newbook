@@ -9,9 +9,7 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
 
 @Entity
-@Table(name = "MEMBERS", uniqueConstraints = {@UniqueConstraint(    // @UniqueConstraint -> ddl-auto: create 인 경우에만 유효
-        columnNames = {"nickname"}
-)})
+@Table(name = "MEMBERS")
 @Getter
 public class Member {
     @Id
@@ -19,23 +17,11 @@ public class Member {
     @Column(name = "member_id")
     private Long id;
 
-    @NotNull
     private String oauthId;
 
     @Enumerated(EnumType.STRING)
-    @NotNull
     private OauthDomain oauthDomain;
 
-    @NotBlank
-    @Size(min = 2, max = 50)
-    private String nickname;    // unique
-
-    public static Member createMember(String oAuthId, OauthDomain oAuthDomain, String nickname){
-        Member member = new Member();
-        member.oauthId = oAuthId;
-        member.oauthDomain = oAuthDomain;
-        member.nickname = nickname;
-
-        return member;
-    }
+    // UNIQUE
+    private String nickname;
 }
