@@ -13,35 +13,32 @@ import java.util.List;
 @Repository
 @RequiredArgsConstructor
 public class MemberRepository {
-
     private final EntityManager em;
 
 
-    public Long save(Member member) {
-        if(member.getId() == null){
-            em.persist(member);
-        }else{
-            em.merge(member);
-        }
-        return member.getId();
+    // 회원 추가
+    public void save(Member member) {
+        em.persist(member);
     }
 
+    // 회원 조회(ID)
     public Member findById(Long id) {
         return em.find(Member.class, id);
     }
 
+    // 회원 조회(OAuth Id && OAuth Domain)
     public Member findByOauthIdAndOauthDomain(String oauthId, OauthDomain oauthDomain) {
-        JPAQueryFactory query = new JPAQueryFactory(em);
-        QMember qMember = QMember.member;
 
-        List<Member> members = query.select(qMember)
-                .where(qMember.oauthId.eq(oauthId)
-                        .and(qMember.oauthDomain.eq(oauthDomain))
-                ).from(qMember).fetch();
+        String query = "SELECT m FROM Member m " +
+                        " WHERE m.oauthId =:oauthId " +
+                        " AND " +
+                        " m.oauthDomain =: oauthDomain";
 
-        if(members.size() == 0){
-            return null;
-        }
-        return members.get(0);
+        Member findMember = (Member) em.createQuery(query)
+                .setParameter("oauthId", oauthId)
+                .setParameter("oauthDomain", oauthDomain)
+                .getResultList().stream().findFirst().orElse(null);
+
+        return findMember;
     }
 }
