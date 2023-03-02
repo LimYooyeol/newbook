@@ -18,4 +18,14 @@ public class AuthInfo {
     private Member member;
 
     private LocalDateTime expireDate;
+
+    protected AuthInfo(){}
+    public static AuthInfo createAuthInfo(String tokenId, Member member, LocalDateTime expireDate) {
+        AuthInfo authInfo = new AuthInfo();
+        authInfo.tokenId = tokenId;
+        authInfo.member = member;
+        authInfo.expireDate = expireDate;
+
+        return authInfo;
+    }
 }

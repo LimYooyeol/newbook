@@ -1,12 +1,7 @@
 package com.glolearn.newbook.domain;
-
 import com.glolearn.newbook.domain.Auth.OauthDomain;
-import com.sun.istack.NotNull;
 import lombok.Getter;
-
 import javax.persistence.*;
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.Size;
 
 @Entity
 @Table(name = "MEMBERS")
@@ -24,4 +19,15 @@ public class Member {
 
     // UNIQUE
     private String nickname;
+
+    protected Member(){}
+
+    public static Member createMember(String oauthId, OauthDomain oauthDomain, String nickname){
+        Member member = new Member();
+        member.oauthId = oauthId;
+        member.oauthDomain = oauthDomain;
+        member.nickname = nickname;
+
+        return member;
+    }
 }
