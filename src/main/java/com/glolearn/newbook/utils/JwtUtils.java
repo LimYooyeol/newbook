@@ -1,10 +1,10 @@
 package com.glolearn.newbook.utils;
 
+import com.glolearn.newbook.exception.InvalidJwtException;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.SignatureException;
-import io.jsonwebtoken.impl.crypto.JwtSignatureValidator;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseCookie;
@@ -20,12 +20,16 @@ public class JwtUtils {
     @Value("${secret-key}")
     private String secretKey;   // 외부에 의존적인 값이 있는 경우엔 Bean 으로 동록( vs static)
 
+    // 1시간
     public final long ACCESS_TOKEN_LIFESPAN_MILLI = 1000*60*60;
+
+    // 2주
     public final long REFRESH_TOKEN_LIFESPAN_MILLI = 1000*60*60*24*14;
 
     public final long ACCESS_TOKEN_LIFESPAN_SEC = 60*60;
     public final long REFRESH_TOKEN_LIFESPAN_SEC = 60*60*24*14;
 
+    // access token 생성
     public String createAccessToken(Long memberId){
         Claims claims = Jwts.claims().setSubject(memberId.toString());
         Date now = new Date();
@@ -38,7 +42,9 @@ public class JwtUtils {
                 .compact();
     }
 
-    public String createRefreshToken(String refreshTokenId){
+    // refresh token 생성
+    public String createRefreshToken(){
+        String refreshTokenId = UUID.randomUUID().toString();
         Claims claims = Jwts.claims().setSubject(refreshTokenId);
         Date now = new Date();
         return Jwts.builder()
@@ -50,43 +56,43 @@ public class JwtUtils {
                 .compact();
     }
 
-    /*
-        #shorts :
-            Token 에서 사용자 ID 추출
-        #warning:
-            유효성 검사 후 호출하는 것이 안전
-     */
+    // access token 에서 sub 추출
     public Long getSub(String accessToken){
         try{
             return Long.parseLong(Jwts.parser().setSigningKey(secretKey)
                 .parseClaimsJws(accessToken)
                 .getBody().getSubject());
         }catch (Exception e){
-            return null;
+            throw new InvalidJwtException("Invalid JWT");
         }
     }
 
-    /*
-        #shorts :
-            Token 에서 토큰 ID 추출
-        #warning:
-            유효성 검사 후 호출하는 것이 안전
-     */
+    // refresh token ID 추출
     public String getRefreshTokenId(String refreshToken){
         try{
             return Jwts.parser().setSigningKey(secretKey)
-                .parseClaimsJws(refreshToken)
-                .getBody().getSubject();
+                    .parseClaimsJws(refreshToken)
+                    .getBody().getSubject();
         }catch (Exception e){
-            return null;
+            throw new InvalidJwtException("Invalid JWT");
         }
     }
 
-    // token 자체의 유효성만 검사
-    public boolean validate(String token) {
-        if(token == null){
-            return false;
+    // token
+    // 만료일 추출
+    public Date getExpiration(String token){
+        try{
+            return Jwts.parser().setSigningKey(secretKey)
+                    .parseClaimsJws(token)
+                    .getBody().getExpiration();
+        }catch (Exception e){
+            throw new InvalidJwtException("Invalid JWT");
         }
+    }
+
+
+    // token 자체의 유효성 검사 (만료 기간, 위조 여부)
+    public boolean validate(String token) {
         try{
             Date expiration = Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token).getBody().getExpiration();
             if(expiration.before(new Date())){
@@ -99,10 +105,7 @@ public class JwtUtils {
         return true;
     }
 
-    /*
-        #shorts :
-            HttpServletResponse 에 access token 과 refresh token 을 HttpOnlyCookie 로 담아줌
-     */
+    //HttpServletResponse 에 access token 과 refresh token 을 HttpOnlyCookie 로 담아줌
     public void issueAccessTokenAndRefreshToken(HttpServletResponse response,
                                                 String userAccessToken,
                                                 String userRefreshToken) {
