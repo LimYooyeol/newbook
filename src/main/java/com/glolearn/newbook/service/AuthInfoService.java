@@ -6,51 +6,47 @@ import com.glolearn.newbook.repository.AuthInfoRepository;
 import com.glolearn.newbook.repository.MemberRepository;
 import com.glolearn.newbook.utils.JwtUtils;
 import lombok.RequiredArgsConstructor;
-import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.ZoneId;
 import java.util.Date;
-import java.util.UUID;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
-public class AuthService {
+@Transactional
+public class AuthInfoService {
     private final MemberRepository memberRepository;
     private final AuthInfoRepository authInfoRepository;
     private final JwtUtils jwtUtils;
 
-    /*
-        #shorts :
-            refresh token 을 생성하면서 DB 에도 그 ID를 저장
-        #to do  :
-            코드 정리하기
-     */
-    @Transactional
-    public String addAuthorization(Long memberId){
-        String refreshTokenId = UUID.randomUUID().toString();
-        Member member = memberRepository.findById(memberId);
+    // Refresh token 인증 정보 저장
+    public void addAuthInfo(String refreshToken, Member member){
+        String tokenId = jwtUtils.getRefreshTokenId(refreshToken);
+        Date expiration = jwtUtils.getExpiration(refreshToken);
 
-        String refreshToken = jwtUtils.createRefreshToken(refreshTokenId);
-        Date expires = new Date(new Date().getTime() + jwtUtils.REFRESH_TOKEN_LIFESPAN_MILLI);
-        AuthInfo authInfo = AuthInfo.createAuthInfo(refreshTokenId, member, expires.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime());
-        authInfoRepository.addMember(authInfo);
+        AuthInfo authInfo = AuthInfo.createAuthInfo(tokenId, member, expiration.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime());
 
-        return refreshToken;
+        authInfoRepository.save(authInfo);
     }
 
-    @Transactional
-    public void removeAuthorization(String refreshToken){
-        String refreshTokenId = jwtUtils.getRefreshTokenId(refreshToken);
-        if(refreshTokenId == null){ // RefreshToken 이 유효하지 않은 경우
-            return;
+    // refresh token 인증 정보 조회
+    @Transactional(readOnly = true)
+    public AuthInfo findAuthInfo(String refreshToken){
+        String tokenId = jwtUtils.getRefreshTokenId(refreshToken);
+
+        Optional<AuthInfo> authInfo  = authInfoRepository.findById(tokenId);
+        if(authInfo.isPresent()){
+            return authInfo.get();
         }
 
-        try{
-            authInfoRepository.deleteById(refreshTokenId);
-        }catch(EmptyResultDataAccessException e){
-            return;
-        }
+        return null;
+    }
+
+    // token Id로 Auth info 삭제
+    public void removeAuthInfo(String refreshToken){
+        String refreshTokenId = jwtUtils.getRefreshTokenId(refreshToken);
+        authInfoRepository.deleteById(refreshTokenId);
     }
 }
