@@ -14,6 +14,7 @@ public class MemberService {
     private final MemberRepository memberRepository;
 
     // 회원 추가
+    @Transactional
     public void addMember(Member member){
         memberRepository.save(member);
     }
