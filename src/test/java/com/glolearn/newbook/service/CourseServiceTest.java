@@ -13,6 +13,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.persistence.EntityManager;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -22,6 +23,8 @@ import static org.junit.jupiter.api.Assertions.*;
 class CourseServiceTest {
     @Autowired MemberService memberService;
     @Autowired CourseService courseService;
+    @Autowired
+    EntityManager em;
 
     @Test
     public void 코스_추가_테스트(){
@@ -117,11 +120,10 @@ class CourseServiceTest {
     @Test
     public void 인기코스_조회_테스트(){
         //given
-        Member member = Member.createMember("test", OauthDomain.NAVER, "홍길동");
-        memberService.addMember(member);
-
         int size = 5;
         for(int i = 0; i < size; i++){
+            Member member = Member.createMember("test" + i, OauthDomain.NAVER, "홍길동" + i);
+            memberService.addMember(member);
             CourseRegisterDto courseRegisterDto = new CourseRegisterDto();
             courseRegisterDto.setTitle("코스" + i);
             courseRegisterDto.setIntroduction("코스에 대한 설명" + i);
@@ -131,8 +133,14 @@ class CourseServiceTest {
             courseService.addCourse(member.getId(), courseRegisterDto);
         }
 
+        em.clear();
+
         //when
         List<Course> popularCourses = courseService.findPopularCourseList();
+        for(Course c : popularCourses){
+            System.out.println(c.getLecturer().getNickname());
+            System.out.println(c.getIntroduction().getIntroduction());
+        }
 
         //then
         assertNotNull(popularCourses);

@@ -9,7 +9,6 @@ import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
 class JwtUtilsTest {
-
     @Autowired JwtUtils jwtUtils;
 
     @Test

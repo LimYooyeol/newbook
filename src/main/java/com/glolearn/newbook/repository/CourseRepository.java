@@ -12,11 +12,10 @@ import java.util.List;
 @Repository
 public interface CourseRepository extends JpaRepository<Course, Long> {
 
-    public List<Course> findAllByOrderByNumStudentDesc(Pageable pageable);
 
-//    @Query(value = "SELECT C.course_id, C.cover, C.title, C.num_student, M.nickname\n" +
-//            " FROM COURSE C JOIN MEMBERS M ON C.lecturer = M.member_id\n" +
-//            " ORDER BY C.num_student DESC",
-//            nativeQuery = true)
-//    public List<CourseBriefDto> findCourseBriefByNumStudentDesc(Pageable pageable);
+    @Query("select c from Course c " +
+            " left join fetch c.lecturer " +
+            " left join fetch c.introduction " +
+            " order by c.numStudent ")
+    public List<Course> findAllByOrderByNumStudentDesc(Pageable pageable);
 }
