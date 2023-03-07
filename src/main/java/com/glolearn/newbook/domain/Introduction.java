@@ -12,4 +12,14 @@ public class Introduction {
     private Long id;
 
     private String introduction;
+
+    protected Introduction(){}
+
+    public Introduction(String introduction){
+        this.introduction = introduction;
+    }
+
+    public void updateIntroduction(String introduction){
+        this.introduction = introduction;
+    }
 }

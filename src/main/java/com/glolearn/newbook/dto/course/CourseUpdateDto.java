@@ -4,7 +4,7 @@ import com.glolearn.newbook.domain.Category;
 import lombok.Data;
 
 @Data
-public class CourseRegisterDto {
+public class CourseUpdateDto {
     private String title;
 
     private String introduction;
