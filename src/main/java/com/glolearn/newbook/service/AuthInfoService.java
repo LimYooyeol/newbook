@@ -22,12 +22,12 @@ public class AuthInfoService {
     private final JwtUtils jwtUtils;
 
     // Refresh token 인증 정보 저장
-    public void addAuthInfo(String refreshToken, Member member){
+    public void addAuthInfo(String refreshToken, Long memberId){
         String tokenId = jwtUtils.getRefreshTokenId(refreshToken);
         Date expiration = jwtUtils.getExpiration(refreshToken);
 
+        Member member = memberRepository.findById(memberId);
         AuthInfo authInfo = AuthInfo.createAuthInfo(tokenId, member, expiration.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime());
-
         authInfoRepository.save(authInfo);
     }
 

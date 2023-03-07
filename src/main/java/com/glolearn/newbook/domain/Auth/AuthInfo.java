@@ -1,9 +1,7 @@
 package com.glolearn.newbook.domain.Auth;
 
 import com.glolearn.newbook.domain.Member;
-import com.sun.istack.NotNull;
 import lombok.Getter;
-
 import javax.persistence.*;
 import java.time.LocalDateTime;
 
@@ -18,7 +16,6 @@ public class AuthInfo {
     private Member member;
 
     private LocalDateTime expireDate;
-
     protected AuthInfo(){}
     public static AuthInfo createAuthInfo(String tokenId, Member member, LocalDateTime expireDate) {
         AuthInfo authInfo = new AuthInfo();

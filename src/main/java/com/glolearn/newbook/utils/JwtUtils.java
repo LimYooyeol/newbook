@@ -29,7 +29,7 @@ public class JwtUtils {
     public final long ACCESS_TOKEN_LIFESPAN_SEC = 60*60;
     public final long REFRESH_TOKEN_LIFESPAN_SEC = 60*60*24*14;
 
-    // access token 생성
+    // access token 생성 (user -> ours)
     public String createAccessToken(Long memberId){
         Claims claims = Jwts.claims().setSubject(memberId.toString());
         Date now = new Date();
@@ -42,7 +42,7 @@ public class JwtUtils {
                 .compact();
     }
 
-    // refresh token 생성
+    // refresh token 생성 (user -> ours)
     public String createRefreshToken(){
         String refreshTokenId = UUID.randomUUID().toString();
         Claims claims = Jwts.claims().setSubject(refreshTokenId);

@@ -1,7 +1,7 @@
-package com.glolearn.newbook.exception;
+package com.glolearn.newbook.oauth.exception;
 
-public class InvalidAccessTokenException extends Exception{
-    String message;
+public class InvalidAccessTokenException extends RuntimeException{
+    private String message;
 
     public InvalidAccessTokenException(String message){
         this.message = message;
