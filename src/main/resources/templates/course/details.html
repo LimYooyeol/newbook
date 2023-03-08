@@ -6,11 +6,22 @@
 <div class="container">
     <div th:replace = "fragments/nav::nav"></div>
     <div class="row" style="display:flex;">
-        <div class="col-5" style="width:400px; height:300px;">
-            <img src="/image/temp_image.PNG" style = "width:100%; height:100%;">
+        <div class="col-5" style="width:300px; height:250px;">
+            <img th:src="${courseDetailsDto.cover}" style = "width:100%; height:100%;">
         </div>
-        <div class="col-7" style="background-color:green;">
-            ㅎㅇ2
+        <div class="col-7">
+            <div class="row">
+                <h3 th:text="${courseDetailsDto.title}"></h3>
+            </div>
+            <div class="row">
+                <p style="font-weight:bold;" th:text="'강의자:' + ${courseDetailsDto.lecturer}"></p>
+            </div>
+            <div class="row">
+                <p th:text="${courseDetailsDto.numStudent} + '명이 수강 중'"></p>
+            </div>
+            <div class="row">
+                <p th:text="${courseDetailsDto.regDate} + ' 등록 됨'"></p>
+            </div>
         </div>
     </div>
     <div class="row">
@@ -29,9 +40,8 @@
         <div id="display0" class="col">
             <div class="row">
                 <div class="col">
-                    <div>
-                        소개소개소개소개ㅎ
-                    </div>
+                    <input id="introduction" th:value="${courseDetailsDto.introduction}" type="hidden"></input>
+                    <div id="viewer"></div>
                 </div>
             </div>
         </div>
@@ -53,7 +63,15 @@
 </body>
 <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
 <script src="/javascripts/bootstrap.js"></script>
+<script src="https://uicdn.toast.com/editor/latest/toastui-editor-all.min.js"></script>
 <script>
+    const viewer = toastui.Editor.factory({
+        el: document.getElementById('viewer'),
+        viewer:true,
+        height: '600px',
+        initialValue: document.getElementById('introduction').value
+    })
+
     function changeTab(option){
         var showTab = document.getElementById('tab' + option)
         var hideTab = document.getElementById('tab' + (option + 1)%2)

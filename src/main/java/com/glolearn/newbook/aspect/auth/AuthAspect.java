@@ -5,6 +5,7 @@ import com.glolearn.newbook.repository.AuthInfoRepository;
 import com.glolearn.newbook.service.AuthInfoService;
 import com.glolearn.newbook.utils.JwtUtils;
 import lombok.RequiredArgsConstructor;
+import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.After;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Before;
@@ -32,7 +33,7 @@ public class AuthAspect {
             token 값을 보고 UserContext 에 회원번호 기록
      */
     @Before("@annotation(com.glolearn.newbook.annotation.Auth)")
-    public void authorization() throws Throwable {
+    public void authorization(JoinPoint joinPoint) {
         UserContext.clear();    // 쓰레드 풀 사용으로 인한 오류 방지
 
         HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest();
@@ -44,6 +45,7 @@ public class AuthAspect {
         // refresh token 확인
         Cookie refreshTokenCookie = WebUtils.getCookie(request, "refresh_token");
         String refreshToken = (refreshTokenCookie == null)? null : refreshTokenCookie.getValue();
+
 
 
         if(accessToken != null && jwtUtils.validate(accessToken)){
@@ -78,7 +80,7 @@ public class AuthAspect {
 
             String userAccessToken = jwtUtils.createAccessToken(memberId);
             String userRefreshToken = jwtUtils.createRefreshToken();
-            authService.addAuthInfo(userAccessToken, memberId);
+            authService.addAuthInfo(userRefreshToken, memberId);
 
             jwtUtils.issueAccessTokenAndRefreshToken(response, userAccessToken, userRefreshToken);
         }

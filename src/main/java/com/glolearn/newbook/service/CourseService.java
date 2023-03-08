@@ -2,7 +2,9 @@ package com.glolearn.newbook.service;
 
 import com.glolearn.newbook.domain.Course;
 import com.glolearn.newbook.domain.Member;
+import com.glolearn.newbook.dto.course.CoursePreviewDto;
 import com.glolearn.newbook.dto.course.CourseRegisterDto;
+import com.glolearn.newbook.dto.course.CourseSearchDto;
 import com.glolearn.newbook.dto.course.CourseUpdateDto;
 import com.glolearn.newbook.repository.CourseRepository;
 import com.glolearn.newbook.repository.MemberRepository;
@@ -15,6 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional(readOnly = true)
@@ -54,11 +57,21 @@ public class CourseService {
     }
 
     // 인기 코스 조회
-    public List<Course> findPopularCourseList(){
+    public List<CoursePreviewDto> findPopularCourseList(){
         Pageable pageable = PageRequest.of(0, 5);
         List<Course> popularCourses = courseRepository.findAllByOrderByNumStudentDesc(pageable);
+        List<CoursePreviewDto> result = popularCourses.stream()
+                .map(c -> new CoursePreviewDto(c))
+                .collect(Collectors.toList());
 
-        return popularCourses;
+        return result;
+
+
+    }
+
+    // 코스 리스트 조회
+    public List<Course> findCourses(CourseSearchDto courseSearchDto){
+        return courseRepository.findCourses(courseSearchDto);
     }
 
 }

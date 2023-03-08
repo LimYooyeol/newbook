@@ -10,38 +10,19 @@
         </div>
 
         <div class="row">
-            <th:block th:if ="${recentCourses}">
-                <div th:each="course : {recentCourses}">
-                    <div class="card" style="width: 18rem;">
-                        <img class="card-img-top" src="..." alt="Card image cap">
-                        <div class="card-body">
-                            <h5 class="card-title"><a href="/course/1">JAVA 배우기</a></h5>
-                            <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
-                            <a href="#" class="btn btn-primary">Go somewhere</a>
-                        </div>
+            <th:block th:if ="${popularCourses}">
+                <div class="card" th:each="course: ${popularCourses}">
+                    <img class="card-img-top" th:src="${course.cover}" alt="Card image cap"
+                        style="height:50%;">
+                    <div class="card-body">
+                        <h5 class="card-title">
+                            <a th:text="${course.title}" th:href="'/course/'+${course.courseId}" style="color:black"></a>
+                        </h5>
+                        <p class="card-text" style="font-weight:bold;" th:text="${course.lecturer}"></p>
+                        <p class="card-text" th:text="${course.numStudent} + '명이 수강 중'"></p>
                     </div>
                 </div>
             </th:block>
-            <div class="card">
-                <img class="card-img-top" src="/image/temp_image.PNG" alt="Card image cap">
-                <div class="card-body">
-                    <h5 class="card-title">
-                        <a href="/course/1" style="color:black">JAVA 배우기</a>
-                    </h5>
-                    <p class="card-text" style="font-weight:bold;">홍길동</p>
-                    <p class="card-text">152명이 수강 중</p>
-                </div>
-            </div>
-            <div class="card">
-                <img class="card-img-top" src="/image/temp_image.PNG" alt="Card image cap">
-                <div class="card-body">
-                    <h5 class="card-title">
-                        임시 게시물 넣어놓기(2) - no tf
-                    </h5>
-                    <p class="card-text" style="font-weight: bold;">이상한 개발자 이름 엄청 긴 개발자 이름</p>
-                    <p class="card-text">139명이 수강 중</p>
-                </div>
-            </div>
         </div>
 
     </div>

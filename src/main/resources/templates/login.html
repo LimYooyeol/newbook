@@ -21,12 +21,12 @@
 
     const url = new URL(document.location.href)
 
-    var state = url.searchParams.get('from')
-    if(state == null) { state = '/' }
+    var after = url.searchParams.get('after')
+    if(after == null) { after = '/' }
 
     Kakao.Auth.authorize({
       redirectUri: 'http://localhost:8080/oauth/kakao/token',
-      state: state
+      state: after
     })
 
   }

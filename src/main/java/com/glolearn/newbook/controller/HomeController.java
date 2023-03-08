@@ -2,8 +2,10 @@ package com.glolearn.newbook.controller;
 
 import com.glolearn.newbook.annotation.Auth;
 import com.glolearn.newbook.aspect.auth.UserContext;
-import com.glolearn.newbook.domain.Course;
 import com.glolearn.newbook.domain.Member;
+import com.glolearn.newbook.dto.course.CoursePreviewDto;
+import com.glolearn.newbook.exception.InvalidAccessException;
+import com.glolearn.newbook.oauth.exception.InvalidAccessTokenException;
 import com.glolearn.newbook.service.CourseService;
 import com.glolearn.newbook.service.MemberService;
 import lombok.RequiredArgsConstructor;
@@ -27,6 +29,26 @@ public class HomeController {
             if(member != null) {model.addAttribute("nickname", member.getNickname());}
         }
 
+        List<CoursePreviewDto> popularCourses = courseService.findPopularCourseList();
+        model.addAttribute("popularCourses", popularCourses);
+
         return "index";
+    }
+
+    @GetMapping("/lecturer")
+    @Auth
+    public String lecturerHome(Model model){
+        if(UserContext.getCurrentMember() == null){
+            return "redirect:/login";
+        }
+        Member member = memberService.findMember(UserContext.getCurrentMember());
+        if(member == null){
+            throw new InvalidAccessException("Token with non-existing member.");
+        }
+
+        model.addAttribute("nickname", member.getNickname());
+
+
+        return "/lecturer/course/list";
     }
 }
