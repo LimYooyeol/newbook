@@ -145,9 +145,13 @@ class CourseServiceTest {
     public void 코스목록_조회_테스트() throws InterruptedException {
         //given
         int size = 14;
+        Member findMember = null;
         for(int i = 0; i < size; i++){
             Member member = Member.createMember("test" + i, OauthDomain.NAVER, "홍길동" + i);
             memberService.addMember(member);
+            if(i == 11){
+                findMember = member;
+            }
             CourseRegisterDto courseRegisterDto = new CourseRegisterDto();
             courseRegisterDto.setTitle("코스" + i);
             courseRegisterDto.setIntroduction("코스에 대한 설명" + i);
@@ -179,18 +183,25 @@ class CourseServiceTest {
         categorySearch.setSearch("1");
         categorySearch.setSort(Sort.RECENT);
 
+        //회원으로 검색
+        CourseSearchDto memberSearch = new CourseSearchDto();
+        memberSearch.setPageNum(0);
+        memberSearch.setPageSize(size);
+        memberSearch.setLecturer(findMember.getId());
+
         em.clear();
 
         //when
         List<Course> coursesBasic = courseService.findCourses(courseSearchDtoBasic);
         List<Course> aiCourses = courseService.findCourses(categorySearch);
+        List<Course> memberCourses = courseService.findCourses(memberSearch);
 
         //then
         assertEquals((size-1)%courseSearchDtoBasic.getPageSize(), coursesBasic.size());
 
         // 주의: size 달라지면 달라짐
-        System.out.println(aiCourses);
         assertEquals(2 , aiCourses.size());
+        assertEquals(1, memberCourses.size());
     }
 
 

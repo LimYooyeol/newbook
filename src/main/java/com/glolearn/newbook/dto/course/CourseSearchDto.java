@@ -14,4 +14,6 @@ public class CourseSearchDto {
     private int pageSize;
 
     private Sort sort;
+
+    private Long lecturer;
 }

@@ -25,6 +25,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static com.glolearn.newbook.domain.QCourse.course;
+import static com.glolearn.newbook.domain.QMember.member;
 
 @Repository
 @RequiredArgsConstructor
@@ -67,7 +68,8 @@ public class CourseRepository {
         return  query.from(course).join(course.lecturer, member).fetchJoin()
                 .where(isPublished(),
                         eqCategory(courseSearchDto.getCategory()),
-                        titleLike(courseSearchDto.getSearch())
+                        titleLike(courseSearchDto.getSearch()),
+                        courseBy(courseSearchDto.getLecturer())
                 )
                 .orderBy(getSort(courseSearchDto.getSort()))
                 .offset(courseSearchDto.getPageNum()* courseSearchDto.getPageSize())
@@ -75,7 +77,18 @@ public class CourseRepository {
                 .fetch();
     }
 
+    private BooleanExpression courseBy(Long memberId) {
+        if(memberId == null){
+            return null;
+        }
+        return member.id.eq(memberId);
+    }
+
     private OrderSpecifier getSort(Sort sort) {
+        if(sort == null){
+            sort = Sort.RECENT;
+        }
+
         if(sort.equals(Sort.RECENT)){
             return new OrderSpecifier(Order.DESC, course.regDate);
         }else if(sort.equals(Sort.POPULAR)){
