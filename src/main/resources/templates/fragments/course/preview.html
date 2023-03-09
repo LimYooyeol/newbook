@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html
+        xmlns:th = "http://www.thymeleaf.org">
+<div th:fragment="preview" class="row" style="width:88%">
+    <th:block th:if ="${courses}">
+        <div class="card" th:each="course: ${courses}">
+            <img class="card-img-top" th:src="${course.cover}" alt="Card image cap"
+                 style="height:50%;">
+            <div class="card-body">
+                <h5 class="card-title">
+                    <a th:text="${course.title}" th:href="'/course/'+${course.courseId}" style="color:black"></a>
+                </h5>
+                <p class="card-text" style="font-weight:bold;" th:text="${course.lecturer}"></p>
+                <p class="card-text" th:text="${course.numStudent} + '명이 수강 중'"></p>
+            </div>
+        </div>
+    </th:block>
+</div>
+<div th:fragment="managePreview" class="row" style="width:88%">
+    <th:block th:if ="${courses}">
+        <div class="card" th:each="course: ${courses}">
+            <img class="card-img-top" th:src="${course.cover}" alt="Card image cap"
+                 style="height:50%;">
+            <div class="card-body">
+                <h5 class="card-title">
+                    <a th:text="${course.title}" th:href="'/course/'+${course.courseId}" style="color:black"></a>
+                </h5>
+                <p class="card-text" style="font-weight:bold;" th:text="${course.lecturer}"></p>
+                <p class="card-text" th:text="${course.numStudent} + '명이 수강 중'"></p>
+            </div>
+            <a th:href="@{/lecturer/course/{courseId}(courseId = ${course.courseId})}">관리하기</a>
+        </div>
+    </th:block>
+</div>
+</html>

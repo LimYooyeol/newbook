@@ -7,12 +7,14 @@
     <div th:replace = "fragments/nav_lecturer::nav"></div>
     <div class="row">
         <div class="col">
-            <h3>{title}</h3>
+            <h3 th:text="${course.title}"></h3>
         </div>
     </div>
     <div class="row">
         <div class="col">
-            <button style="float:right;">삭제</button>
+            <button style="float:right;" th:onclick="|deleteCourse('${course.id}')|">
+                삭제
+            </button>
         </div>
     </div>
     <div class="row">
@@ -31,24 +33,24 @@
         <div id="display0" class="col">
             <div class="row">
                 <div class="col">
-                    <button style="float:right;">수정</button>
+                    <button style="float:right;">
+                        <a th:href="@{/lecturer/course/{id}/modify(id=${course.id})}">수정</a>
+                    </button>
                 </div>
             </div>
             <div class="row">
                 <div class="col">
                     <h3>제목</h3>
-                    <h3>{title}</h3><br>
+                    <h3 th:text="${course.title}">{title}</h3><br>
                     <h3>커버</h3>
                     <div style="width: 12em; height: 9em; border: 1px solid; display: flex;
                             align-items: center;">
                         <div style="width:100%; text-align: center;">
-                            커버 이미지
+                            <img style="width:100%;" th:src="${course.cover}">
                         </div>
                     </div><br>
                     <h3>소개</h3>
-                    <div>
-                        소개소개소개소개ㅎ
-                    </div>
+                    <div id="viewer"></div>
                 </div>
             </div>
         </div>
@@ -70,13 +72,24 @@
                 </li>
             </ul>
         </div>
-
     </div>
 </div>
+<form th:action="@{/course/{id}(id=${course.id})}" method="post" id="deleteForm">
+    <input type="hidden" name="_method" value="DELETE">
+</form>
+
+<input type="hidden" id="introduction" th:value="${course.introduction}">
 </body>
 <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
 <script src="/javascripts/bootstrap.js"></script>
+<script src="https://uicdn.toast.com/editor/latest/toastui-editor-all.min.js"></script>
 <script>
+    const viewer = toastui.Editor.factory({
+        el: document.getElementById('viewer'),
+        viewer:true,
+        height: '600px',
+        initialValue: document.getElementById('introduction').value
+    })
     function changeTab(option){
         var showTab = document.getElementById('tab' + option)
         var hideTab = document.getElementById('tab' + (option + 1)%2)
@@ -94,6 +107,13 @@
         hide.style.display = 'none'
         display.style.display = 'unset'
 
+    }
+
+    function deleteCourse(id){
+        var input = confirm('정말 삭제하시겠습니까?')
+        if(input){
+            document.getElementById('deleteForm').submit()
+        }
     }
 </script>
 </html>

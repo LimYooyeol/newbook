@@ -27,7 +27,7 @@
                 <div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdown">
                     <p class="dropdown-item" th:text = "${nickname} + 님"></p>
                     <a class="dropdown-item" href="#">마이 페이지</a>
-                    <a class="dropdown-item" href="/lecturer">강사 전환</a>
+                    <a class="dropdown-item" href="/lecturer/courses/all">강사 전환</a>
                     <div class="dropdown-divider"></div>
                     <form id = "logoutForm" action="/oauth/token" th:method="DELETE" style="text-align:center;">
                         <button type="submit" style="background:none; border: none; cursor: pointer">로그아웃</button>

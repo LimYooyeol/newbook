@@ -3,16 +3,14 @@
         xmlns:th = "http://www.thymeleaf.org">
 <head th:replace = "fragments/header :: header">
 <body>
+<input id="pagingBase" type="hidden" value="/lecturer">
 <div class="container">
     <div th:replace="/fragments/nav_lecturer.html::nav"></div>
 
     <div class="row">
         <div class="col-2" style="border-right: 1px solid;">
             <h3>카테고리</h3>
-            <ul>
-                <li>개발</li>
-                <li>AI</li>
-            </ul>
+            <ul th:replace="fragments/paging/category::category"></ul>
         </div>
         <div class="col-10">
             <div class="row">
@@ -24,95 +22,25 @@
                 </div>
             </div>
             <div class="row">
-                <div class="col-5">
-                    <select>
-                        <option>추천순</option>
-                        <option>인기순</option>
-                        <option>최신순</option>
-                    </select>
-                </div>
+                <div th:replace="fragments/paging/sorting::sorting"></div>
                 <div class="col-7">
-                    <button style="float:right">검색</button>
-                    <input type="text" style="float:right">
+                    <button style="float:right" onclick="search()">검색</button>
+                    <input id = "searchKey" type="text" placeholder="강의명 검색" style="float:right" th:value="${courseSearchDto.search}">
                 </div>
             </div>
             <div class="row" style="justify-content:center;">
-                <div class="row" style="width:88%">
-                    <th:block th:if ="${recentCourses}">
-                        <div th:each="course : {recentCourses}">
-                            <div class="card" style="width: 18rem;">
-                                <img class="card-img-top" src="..." alt="Card image cap">
-                                <div class="card-body">
-                                    <h5 class="card-title"><a href="/course/1">JAVA 배우기</a></h5>
-                                    <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
-                                    <a href="#" class="btn btn-primary">Go somewhere</a>
-                                </div>
-                            </div>
-                        </div>
-                    </th:block>
-                    <div class="card">
-                        <img class="card-img-top" src="/image/temp_image.PNG" alt="Card image cap">
-                        <div class="card-body">
-                            <h5 class="card-title">
-                                임시 게시물 만들기(1)
-                            </h5>
-                            <p class="card-text" style="font-weight:bold;">홍길동</p>
-                            <a href="/lecturer/course/1">글 관리하기</a>
-                        </div>
-                    </div>
-                    <div class="card">
-                        <img class="card-img-top" src="/image/temp_image.PNG" alt="Card image cap">
-                        <div class="card-body">
-                            <h5 class="card-title">
-                                임시 게시물 만들기(1)
-                            </h5>
-                            <p class="card-text" style="font-weight:bold;">홍길동</p>
-                            <a href="/lecturer/course/1">글 관리하기</a>
-                        </div>
-                    </div>
-                    <div class="card">
-                        <img class="card-img-top" src="/image/temp_image.PNG" alt="Card image cap">
-                        <div class="card-body">
-                            <h5 class="card-title">
-                                임시 게시물 만들기(1)
-                            </h5>
-                            <p class="card-text" style="font-weight:bold;">홍길동</p>
-                            <a href="/lecturer/course/1">글 관리하기</a>
-                        </div>
-                    </div>
-                    <div class="card">
-                        <img class="card-img-top" src="/image/temp_image.PNG" alt="Card image cap">
-                        <div class="card-body">
-                            <h5 class="card-title">
-                                임시 게시물 만들기(1)
-                            </h5>
-                            <p class="card-text" style="font-weight:bold;">홍길동</p>
-                            <a href="/lecturer/course/1">글 관리하기</a>
-                        </div>
-                    </div>
-                </div>
+                <div th:replace ="fragments/course/preview::managePreview"></div>
             </div>
-            <div class="row" style="justify-content:center"><nav aria-label="...">
-                <ul class="pagination">
-                    <li class="page-item disabled">
-                        <a class="page-link" href="#" tabindex="-1" aria-disabled="true">Previous</a>
-                    </li>
-                    <li class="page-item"><a class="page-link" href="#">1</a></li>
-                    <li class="page-item active" aria-current="page">
-                        <a class="page-link" href="#">2</a>
-                    </li>
-                    <li class="page-item"><a class="page-link" href="#">3</a></li>
-                    <li class="page-item">
-                        <a class="page-link" href="#">Next</a>
-                    </li>
-                </ul>
-            </nav>
+            <div class="row" style="justify-content:center">
+                <nav th:replace = "fragments/paging/pagingNav::pagingNav"></nav>
             </div>
         </div>
     </div>
+    </div>
 </div>
-</div>
+<div th:replace="fragments/paging/pagingForm::pagingForm"></div>
 </body>
 <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
 <script src="/javascripts/bootstrap.js"></script>
+<script src="/javascripts/paging.js"></script>
 </html>

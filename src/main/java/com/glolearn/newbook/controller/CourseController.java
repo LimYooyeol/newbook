@@ -18,10 +18,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.stereotype.Repository;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
 import javax.validation.Valid;
@@ -54,7 +51,6 @@ public class CourseController {
     @PostMapping("/course/register")
     @Auth
     public String register(@Valid CourseRegisterDto courseRegisterDto, BindingResult result, Model model){
-        System.out.println(courseRegisterDto.toString());
         if(result.hasErrors()){
             Member member = memberService.findMember(UserContext.getCurrentMember());
             model.addAttribute("nickname", member.getNickname());
@@ -69,7 +65,7 @@ public class CourseController {
 
         // 2. 등록
         courseService.addCourse(member.getId(), courseRegisterDto);
-        return "redirect:/lecturer";
+        return "redirect:/lecturer/courses/all";
     }
 
     @GetMapping("/course/{id}")
@@ -124,14 +120,13 @@ public class CourseController {
         courseSearchDto.setCategory(Category.of(category));
         courseSearchDto.setSort(Sort.of(sort));
         courseSearchDto.setPageNum(page);
-        courseSearchDto.setPageSize(6);
         courseSearchDto.setSearch(search);
+
+        courseSearchDto.setPageSize(6);
 
         // 검색
         int maxPage = courseService.findMaxPage(courseSearchDto);
-        if(page < 1){
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND);
-        }else if(page > maxPage){
+        if(page < 1 || page > maxPage){
             throw new ResponseStatusException(HttpStatus.NOT_FOUND);
         }
 
@@ -142,6 +137,56 @@ public class CourseController {
         model.addAttribute("courseSearchDto", courseSearchDto);
         model.addAttribute("courses", courses);
         return "/course/list";
+    }
+
+    @PutMapping("/course/{id}")
+    @Auth
+    public String updateCourse(
+            @PathVariable(name = "id") Long id,
+            @Valid CourseUpdateDto courseUpdateDto,
+            BindingResult result,
+            Model model){
+        // 인증 처리
+        if(UserContext.getCurrentMember() == null){ return "redirect:/login";}
+        Member member = memberService.findMember(UserContext.getCurrentMember());
+        if(member == null){ throw new InvalidAccessException("존재하지 않는 유저에 대한 토큰입니다.");}
+
+        // 코스 조회
+        Course course = courseService.findById(id);
+        if(course == null) { throw new ResponseStatusException(HttpStatus.NOT_FOUND);}
+
+        // 권한 조회
+        if(course.getLecturer().getId() != member.getId()){
+            throw new InvalidAccessException("수정 권한이 없습니다.");
+        }
+
+        courseService.modifyCourse(id, courseUpdateDto);
+
+        return "redirect:/lecturer/course/" + id;
+    }
+
+    @DeleteMapping("/course/{id}")
+    @Auth
+    public String deleteCourse(
+            @PathVariable(name = "id")Long id
+    ){
+        // 인증 처리
+        if(UserContext.getCurrentMember() == null){ return "redirect:/login";}
+        Member member = memberService.findMember(UserContext.getCurrentMember());
+        if(member == null){ throw new InvalidAccessException("존재하지 않는 유저에 대한 토큰입니다.");}
+
+        // 코스 조회
+        Course course = courseService.findById(id);
+        if(course == null) { throw new ResponseStatusException(HttpStatus.NOT_FOUND);}
+
+        // 권한 조회
+        if(course.getLecturer().getId() != member.getId()){
+            throw new InvalidAccessException("삭제 권한이 없습니다.");
+        }
+
+        courseService.removeById(id);
+
+        return "redirect:/lecturer/courses/all";
     }
 
 //
@@ -159,35 +204,5 @@ public class CourseController {
 //        return "/course/lecture/details";
 //    }
 //
-//    @GetMapping("/course/list")
-//    @Auth
-//    public String list(){
-//        // 0. 비로그인 처리
-//        Member member = memberService.findMember(UserContext.getCurrentMember());
-//        if(member == null){throw new ResponseStatusException(HttpStatus.UNAUTHORIZED);}
-//
-//        return "/course/list";
-//    }
-//
-//    @GetMapping("/lecturer")
-//    @Auth
-//    public String lecturer(Model model){
-//        // 0. 비로그인 처리
-//        Member member = memberService.findMember(UserContext.getCurrentMember());
-//        if(member != null){model.addAttribute("nickname", member.getNickname());}
-//
-//        return "/lecturer/course/list";
-//    }
-//
-//    @GetMapping("/lecturer/course/{id}")
-//    @Auth
-//    public String manageLecture(Model model,
-//                                @PathVariable(name = "id") Long id){
-//        // 0. 비로그인 처리
-//        Member member = memberService.findMember(UserContext.getCurrentMember());
-//        if(member != null){model.addAttribute("nickname", member.getNickname());}
-//
-//        return "/lecturer/course/manage";
-//    }
 
 }

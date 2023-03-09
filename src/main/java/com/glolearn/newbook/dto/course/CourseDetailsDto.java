@@ -7,6 +7,7 @@ import java.util.List;
 
 @Data
 public class CourseDetailsDto {
+    Long id;
 
     String cover;
 
@@ -21,6 +22,7 @@ public class CourseDetailsDto {
     String introduction;
 
     public CourseDetailsDto(Course course){
+        this.id = course.getId();
         this.cover = course.getCover();
         this.title = course.getTitle();
         this.lecturer = course.getLecturer().getNickname();

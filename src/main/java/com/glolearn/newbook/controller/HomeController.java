@@ -34,21 +34,4 @@ public class HomeController {
 
         return "index";
     }
-
-    @GetMapping("/lecturer")
-    @Auth
-    public String lecturerHome(Model model){
-        if(UserContext.getCurrentMember() == null){
-            return "redirect:/login";
-        }
-        Member member = memberService.findMember(UserContext.getCurrentMember());
-        if(member == null){
-            throw new InvalidAccessException("Token with non-existing member.");
-        }
-
-        model.addAttribute("nickname", member.getNickname());
-
-
-        return "/lecturer/course/list";
-    }
 }

@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html
+        xmlns:th = "http://www.thymeleaf.org">
+<nav th:fragment="pagingNav" aria-label="Page navigation example">
+    <ul class="pagination pagination-sm"
+        th:with = "start=(${courseSearchDto.getPageNum() > 2 ? courseSearchDto.getPageNum()- 2 : 1}),
+                                      last = ${start + 3 > maxPage ? maxPage : start + 3}">
+        <th:block>
+            <li class="page-item">
+                <a class="page-link" th:onclick="movePage(1);">&lt;&lt;</a>
+            </li>
+            <li class="page-item">
+                <a class="page-link" th:onclick="movePage(-1);">&lt;</a>
+            </li>
+            <li th:each = "page : ${#numbers.sequence(start, last)}"
+                th:class="${page == courseSearchDto.getPageNum()}?'page-item active'">
+                <a class="page-link" th:text = "${page}" th:param = "${page}" th:onclick="movePage(this.getAttribute('param'));"></a>
+            </li>
+            <li class="page-item">
+                <a class="page-link" th:onclick="movePage(-2);">&gt;</a>
+            </li>
+            <li class="page-item">
+                <a class="page-link" th:onclick="'movePage(' + ${maxPage} + ')'">&gt;&gt;</a>
+            </li>
+        </th:block>
+    </ul>
+</nav>
+</html>

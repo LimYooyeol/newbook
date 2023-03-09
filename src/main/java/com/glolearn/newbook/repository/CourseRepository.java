@@ -8,6 +8,7 @@ import com.glolearn.newbook.dto.course.CourseSearchDto;
 import com.glolearn.newbook.dto.course.Sort;
 import com.querydsl.core.types.Order;
 import com.querydsl.core.types.OrderSpecifier;
+import com.querydsl.core.types.Predicate;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQuery;
 import lombok.RequiredArgsConstructor;
@@ -71,6 +72,25 @@ public class CourseRepository {
                 .fetch();
     }
 
+    public List<Course> findCoursesByLecturer(Long lecturerId, CourseSearchDto courseSearchDto){
+        JPAQuery<Course> query = new JPAQuery<>(em);
+
+        QCourse course = QCourse.course;
+        QMember member = QMember.member;
+
+        return  query.from(course).join(course.lecturer, member).fetchJoin()
+                .where(
+                        eqCategory(courseSearchDto.getCategory()),
+                        titleLike(courseSearchDto.getSearch()),
+                        lecturedBy(lecturerId)
+                )
+                .orderBy(getSort(courseSearchDto.getSort()))
+                .offset((courseSearchDto.getPageNum()-1)* courseSearchDto.getPageSize())
+                .limit(courseSearchDto.getPageSize())
+                .fetch();
+    }
+
+
     public Long countCourses(CourseSearchDto courseSearchDto){
         JPAQuery<Course> query = new JPAQuery<>(em);
 
@@ -84,6 +104,26 @@ public class CourseRepository {
                 )
                 .orderBy(getSort(courseSearchDto.getSort()))
                 .fetchOne();
+    }
+
+    public Long countCoursesByLecturer(Long lecturerId, CourseSearchDto courseSearchDto){
+        JPAQuery<Course> query = new JPAQuery<>(em);
+
+        QCourse course = QCourse.course;
+        QMember member = QMember.member;
+
+        return  query.select(course.count()).from(course).join(course.lecturer, member)
+                .where(
+                        eqCategory(courseSearchDto.getCategory()),
+                        titleLike(courseSearchDto.getSearch()),
+                        lecturedBy(lecturerId)
+                )
+                .orderBy(getSort(courseSearchDto.getSort()))
+                .fetchOne();
+    }
+
+    private BooleanExpression lecturedBy(Long lecturerId) {
+        return member.id.eq(lecturerId);
     }
 
     private OrderSpecifier getSort(Sort sort) {

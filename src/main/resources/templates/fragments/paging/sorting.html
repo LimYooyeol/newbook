@@ -1,0 +1,12 @@
+<!DOCTYPE html>
+<html
+        xmlns:th = "http://www.thymeleaf.org">
+<div th:fragment="sorting" class="col-5">
+    <select id="sortSelect" name="sortSelect">
+        <option th:each="sort : ${T(com.glolearn.newbook.dto.course.Sort).values()}"
+                th:value="${sort}" th:text="${sort.getValue()}"
+                th:selected = "${courseSearchDto.getSort() == sort}">
+        </option>
+    </select>
+</div>
+</html>

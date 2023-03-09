@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html
+        xmlns:th = "http://www.thymeleaf.org">
+<head th:replace = "fragments/header :: header">
+  <head>
+  </head>
+<body>
+<div class="container">
+  <div th:replace="/fragments/nav_lecturer.html::nav"></div>
+  <form th:action="@{/course/{id}(id=${courseUpdateDto.id})}" method="post" th:object="${courseUpdateDto}">
+    <input type="hidden" name="_method" value="PUT">
+    <div class="row">
+      <div class="col">
+        <h3>제목</h3>
+        <input th:field="*{title}" type="text" placeholder="제목을 입력하세요.">
+        <p th:if="${#fields.hasErrors('title')}" style="color:red;">제목은 2자에서 30자 이내로 입력해주세요.</p>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col">
+        <h3>커버 이미지</h3>
+        <div id="coverOuterDiv" style="width: 12em; height: 9em; border: 1px solid; display: flex;
+                            align-items: center;">
+          <img id="coverImage" src="/" style="width:100%; height:100%; display:none;">
+          <div id = "coverInnerDiv" style="width:100%; text-align: center;">
+            커버 이미지 선택<br>
+            (4: 3 비율 권장)
+          </div>
+        </div>
+        <input type="hidden" th:field="*{cover}">
+        <p th:if="${#fields.hasErrors('cover')}" style="color:red;">커버 이미지를 업로드해주세요.</p>
+        <input type="file" accept="image/*" onchange="changeCover(this)">
+      </div>
+    </div>
+    <div class="row">
+      <div class="col">
+        <h3>소개</h3>
+        <input type="hidden" th:field="*{introduction}">
+        <p th:if="${#fields.hasErrors('introduction')}" style="color:red;">소개를 입력해주세요.</p>
+        <div id = "editor"></div>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col">
+        <h3>카테고리</h3>
+        <select th:field="*{category}">
+          <option th:each = "cat : ${T(com.glolearn.newbook.domain.Category).values()}"
+                  th:value="${cat}" th:text="${cat.getValue()}">
+          </option>
+        </select>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col">
+        <h3>공개하기</h3>
+        <input type="checkbox" th:field = "*{isPublished}">
+      </div>
+    </div>
+    <div class="row">
+      <div class="col">
+        <button class="btn btn-primary" type="submit" onclick="register()" style="float:right;">제출하기</button>
+      </div>
+    </div>
+  </form>
+
+
+</div>
+</body>
+<script src="https://uicdn.toast.com/editor/latest/toastui-editor-all.min.js"></script>
+<script>
+
+document.addEventListener("DOMContentLoaded", function(){
+    if(document.getElementById('cover').value != ''){
+        document.getElementById('coverInnerDiv').style.display = 'none'
+        document.getElementById('coverImage').src = document.getElementById('cover').value
+        document.getElementById('coverImage').style.display = 'block'
+    }
+
+});
+
+</script>
+<script>
+    const Editor = toastui.Editor
+    const editor = new Editor({
+      el: document.querySelector('#editor'),
+      height: '500px',
+      initialEditType: 'markdown',
+      previewStyle: 'vertical',
+      hooks: {
+        addImageBlobHook: (blob, callback) => {
+            const formData = new FormData()
+            formData.append('image', blob)
+
+            fetch(
+                '/image',
+                {
+                    method: 'POST',
+                    body: formData
+                }
+            ).then((res) => {
+                return res.json()
+            }).then((json) => {
+                callback(json.url, '첨부 이미지')
+            })
+        }
+      }
+    })
+    editor.setHTML(document.getElementById('introduction').value)
+
+    function changeCover(image){
+        const formData = new FormData()
+        formData.append('image', image.files[0])
+
+        fetch(
+            '/image',
+            {
+                method: 'POST',
+                body: formData
+            }
+        ).then((res) => {
+            return res.json()
+        }).then((json) => {
+            console.log(json.url)
+            document.getElementById('cover').value = json.url
+            document.getElementById('coverImage').style.display = 'block'
+            document.getElementById('coverImage').src = json.url
+
+            document.getElementById('coverInnerDiv').style.display = 'none'
+        })
+    }
+
+    function register(){
+        document.getElementById('introduction').value = editor.getHTML()
+
+        document.getElementById('registerForm').submit()
+    }
+</script>
+</html>

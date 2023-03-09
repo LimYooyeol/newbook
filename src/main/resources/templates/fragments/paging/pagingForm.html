@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html
+        xmlns:th = "http://www.thymeleaf.org">
+<div th:fragment="pagingForm">
+    <input id="maxPage" type="hidden" th:value="${maxPage}">
+    <form id = "pagingForm" method="get">
+        <input id="pageCategory" name="category" type="hidden" th:if="${courseSearchDto.getCategory()}"
+               th:value="${courseSearchDto.getCategory().toString().toLowerCase()}">
+        <input id="pageSort" type="hidden" th:if="${courseSearchDto.getSort()}"
+               th:value="${courseSearchDto.getSort().toString.toLowerCase()}">
+        <input id="pageNum" type="hidden" th:if="${courseSearchDto.getPageNum()}"
+               th:value="${courseSearchDto.getPageNum()}">
+        <input id="pageSearch" type="hidden" th:if="${courseSearchDto.getSearch()}"
+               th:value="${courseSearchDto.getSearch()}">
+    </form>
+</div>
+</html>

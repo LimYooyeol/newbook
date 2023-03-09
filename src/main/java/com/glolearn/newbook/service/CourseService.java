@@ -63,8 +63,6 @@ public class CourseService {
                 .collect(Collectors.toList());
 
         return result;
-
-
     }
 
     // 코스 리스트 조회
@@ -76,11 +74,26 @@ public class CourseService {
         return result;
     }
 
+    public int findMaxPageByLecturer(Long lecturerId, CourseSearchDto courseSearchDto){
+        int numCourses = Math.toIntExact(courseRepository.countCoursesByLecturer(lecturerId, courseSearchDto));
+
+        return (numCourses-1)/courseSearchDto.getPageSize() + 1;
+    }
+
     // 최대 페이지 수 조회
     public int findMaxPage(CourseSearchDto courseSearchDto){
         int numCourses = Math.toIntExact(courseRepository.countCourses(courseSearchDto));
 
         return (numCourses - 1)/courseSearchDto.getPageSize() + 1;
+    }
+
+    public List<CoursePreviewDto> findCoursesByLecturer(Long lecturerId, CourseSearchDto courseSearchDto){
+        List<Course> lecturerCourses = courseRepository.findCoursesByLecturer(lecturerId, courseSearchDto);
+        List<CoursePreviewDto> result = lecturerCourses.stream()
+                .map(c -> new CoursePreviewDto(c))
+                .collect(Collectors.toList());
+
+        return result;
     }
 
 }
