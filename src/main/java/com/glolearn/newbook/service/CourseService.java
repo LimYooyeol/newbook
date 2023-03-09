@@ -9,14 +9,12 @@ import com.glolearn.newbook.dto.course.CourseUpdateDto;
 import com.glolearn.newbook.repository.CourseRepository;
 import com.glolearn.newbook.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -58,7 +56,7 @@ public class CourseService {
 
     // 인기 코스 조회
     public List<CoursePreviewDto> findPopularCourseList(){
-        Pageable pageable = PageRequest.of(0, 5);
+        Pageable pageable = PageRequest.of(0, 4);
         List<Course> popularCourses = courseRepository.findAllByOrderByNumStudentDesc(pageable);
         List<CoursePreviewDto> result = popularCourses.stream()
                 .map(c -> new CoursePreviewDto(c))
@@ -70,8 +68,19 @@ public class CourseService {
     }
 
     // 코스 리스트 조회
-    public List<Course> findCourses(CourseSearchDto courseSearchDto){
-        return courseRepository.findCourses(courseSearchDto);
+    public List<CoursePreviewDto> findCourses(CourseSearchDto courseSearchDto){
+        List<Course> findCourses = courseRepository.findCourses(courseSearchDto);
+        List<CoursePreviewDto> result = findCourses.stream()
+                    .map(c -> new CoursePreviewDto(c))
+                    .collect(Collectors.toList());
+        return result;
+    }
+
+    // 최대 페이지 수 조회
+    public int findMaxPage(CourseSearchDto courseSearchDto){
+        int numCourses = Math.toIntExact(courseRepository.countCourses(courseSearchDto));
+
+        return (numCourses - 1)/courseSearchDto.getPageSize() + 1;
     }
 
 }

@@ -183,25 +183,18 @@ class CourseServiceTest {
         categorySearch.setSearch("1");
         categorySearch.setSort(Sort.RECENT);
 
-        //회원으로 검색
-        CourseSearchDto memberSearch = new CourseSearchDto();
-        memberSearch.setPageNum(0);
-        memberSearch.setPageSize(size);
-        memberSearch.setLecturer(findMember.getId());
 
         em.clear();
 
         //when
-        List<Course> coursesBasic = courseService.findCourses(courseSearchDtoBasic);
-        List<Course> aiCourses = courseService.findCourses(categorySearch);
-        List<Course> memberCourses = courseService.findCourses(memberSearch);
+        List<CoursePreviewDto> coursesBasic = courseService.findCourses(courseSearchDtoBasic);
+        List<CoursePreviewDto> aiCourses = courseService.findCourses(categorySearch);
 
         //then
         assertEquals((size-1)%courseSearchDtoBasic.getPageSize(), coursesBasic.size());
 
         // 주의: size 달라지면 달라짐
         assertEquals(2 , aiCourses.size());
-        assertEquals(1, memberCourses.size());
     }
 
 

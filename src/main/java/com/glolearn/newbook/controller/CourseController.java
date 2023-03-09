@@ -5,8 +5,7 @@ import com.glolearn.newbook.aspect.auth.UserContext;
 import com.glolearn.newbook.domain.Category;
 import com.glolearn.newbook.domain.Course;
 import com.glolearn.newbook.domain.Member;
-import com.glolearn.newbook.dto.course.CourseDetailsDto;
-import com.glolearn.newbook.dto.course.CourseRegisterDto;
+import com.glolearn.newbook.dto.course.*;
 import com.glolearn.newbook.exception.InvalidAccessException;
 import com.glolearn.newbook.service.CourseService;
 import com.glolearn.newbook.service.MemberService;
@@ -26,6 +25,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.server.ResponseStatusException;
 
 import javax.validation.Valid;
+import java.util.List;
 
 @Controller
 @RequiredArgsConstructor
@@ -95,13 +95,52 @@ public class CourseController {
         return "/course/details";
     }
 
-    @GetMapping("/course/{category}")
+    @GetMapping("/courses")
+    public String initialCourseList(){
+        return "redirect:/courses/all";
+    }
+
+    @GetMapping("/courses/{category}")
+    @Auth
     public String courseList(
             @PathVariable(name = "category", required = false) String category,
-            @RequestParam(required = false, defaultValue = "") String sort,
-            @RequestParam(name = "page") int page
+            @RequestParam(required = false, defaultValue = "recent") String sort,
+            @RequestParam(name = "page", defaultValue = "1") int page,
+            @RequestParam(name = "search", required = false) String search,
+            Model model
     ){
+        Member member;
 
+        // 로그인 정보 처리
+        if(UserContext.getCurrentMember() != null) {
+            member = memberService.findMember(UserContext.getCurrentMember());
+            if (member != null) {
+                model.addAttribute("nickname", member.getNickname());
+            }
+        }
+
+        // 검색 조건 DTO
+        CourseSearchDto courseSearchDto = new CourseSearchDto();
+        courseSearchDto.setCategory(Category.of(category));
+        courseSearchDto.setSort(Sort.of(sort));
+        courseSearchDto.setPageNum(page);
+        courseSearchDto.setPageSize(6);
+        courseSearchDto.setSearch(search);
+
+        // 검색
+        int maxPage = courseService.findMaxPage(courseSearchDto);
+        if(page < 1){
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+        }else if(page > maxPage){
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+        }
+
+
+        List<CoursePreviewDto> courses = courseService.findCourses(courseSearchDto);
+
+        model.addAttribute("maxPage", maxPage);
+        model.addAttribute("courseSearchDto", courseSearchDto);
+        model.addAttribute("courses", courses);
         return "/course/list";
     }
 

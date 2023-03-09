@@ -10,99 +10,157 @@
     <div class="col-2" style="border-right: 1px solid;">
         <h3>카테고리</h3>
         <ul>
-            <li>개발</li>
-            <li>AI</li>
+            <li>
+                <a href="/courses">ALL</a>
+            </li>
+            <li th:each = "cat : ${T(com.glolearn.newbook.domain.Category).values()}"
+            th:value="${cat}">
+                <a th:href="@{/courses/{category}(category = ${cat.toString().toLowerCase()})}"
+                th:text="${cat.getValue()}"></a>
+            </li>
         </ul>
     </div>
     <div class="col-10">
         <div class="row">
             <div class="col-5">
-                <select>
-                    <option>추천순</option>
-                    <option>인기순</option>
-                    <option>최신순</option>
+                <select id="sortSelect" name="sortSelect">
+                    <option th:each="sort : ${T(com.glolearn.newbook.dto.course.Sort).values()}"
+                        th:value="${sort}" th:text="${sort.getValue()}"
+                        th:selected = "${courseSearchDto.getSort() == sort}">
+                    </option>
                 </select>
             </div>
             <div class="col-7">
-                <button style="float:right">검색</button>
-                <input type="text" style="float:right">
+                <button style="float:right" onclick="search()">검색</button>
+                <input id = "searchKey" type="text" placeholder="강의명 검색" style="float:right" th:value="${courseSearchDto.search}">
             </div>
         </div>
         <div class="row" style="justify-content:center;">
             <div class="row" style="width:88%">
-                <th:block th:if ="${recentCourses}">
-                        <div th:each="course : {recentCourses}">
-                            <div class="card" style="width: 18rem;">
-                                <img class="card-img-top" src="..." alt="Card image cap">
-                                <div class="card-body">
-                                    <h5 class="card-title">Card title</h5>
-                                    <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
-                                    <a href="#" class="btn btn-primary">Go somewhere</a>
-                                </div>
-                            </div>
+                <th:block th:if ="${courses}">
+                    <div class="card" th:each="course: ${courses}">
+                        <img class="card-img-top" th:src="${course.cover}" alt="Card image cap"
+                             style="height:50%;">
+                        <div class="card-body">
+                            <h5 class="card-title">
+                                <a th:text="${course.title}" th:href="'/course/'+${course.courseId}" style="color:black"></a>
+                            </h5>
+                            <p class="card-text" style="font-weight:bold;" th:text="${course.lecturer}"></p>
+                            <p class="card-text" th:text="${course.numStudent} + '명이 수강 중'"></p>
                         </div>
-                    </th:block>
-                <div class="card">
-                    <img class="card-img-top" src="/image/temp_image.PNG" alt="Card image cap">
-                    <div class="card-body">
-                        <h5 class="card-title">
-                            임시 게시물 만들기(1)
-                        </h5>
-                        <p class="card-text" style="font-weight:bold;">홍길동</p>
-                        <p class="card-text">152명이 수강 중</p>
                     </div>
-                </div>
-                <div class="card">
-                    <img class="card-img-top" src="/image/temp_image.PNG" alt="Card image cap">
-                    <div class="card-body">
-                        <h5 class="card-title">
-                            임시 게시물 만들기(1)
-                        </h5>
-                        <p class="card-text" style="font-weight:bold;">홍길동</p>
-                        <p class="card-text">152명이 수강 중</p>
-                    </div>
-                </div>
-                <div class="card">
-                    <img class="card-img-top" src="/image/temp_image.PNG" alt="Card image cap">
-                    <div class="card-body">
-                        <h5 class="card-title">
-                            임시 게시물 만들기(1)
-                        </h5>
-                        <p class="card-text" style="font-weight:bold;">홍길동</p>
-                        <p class="card-text">152명이 수강 중</p>
-                    </div>
-                </div>
-                <div class="card">
-                    <img class="card-img-top" src="/image/temp_image.PNG" alt="Card image cap">
-                    <div class="card-body">
-                        <h5 class="card-title">
-                            임시 게시물 만들기(1)
-                        </h5>
-                        <p class="card-text" style="font-weight:bold;">홍길동</p>
-                        <p class="card-text">152명이 수강 중</p>
-                    </div>
-                </div>
+                </th:block>
             </div>
         </div>
-        <div class="row" style="justify-content:center"><nav aria-label="...">
-            <ul class="pagination">
-                <li class="page-item disabled">
-                    <a class="page-link" href="#" tabindex="-1" aria-disabled="true">Previous</a>
-                </li>
-                <li class="page-item"><a class="page-link" href="#">1</a></li>
-                <li class="page-item active" aria-current="page">
-                    <a class="page-link" href="#">2</a>
-                </li>
-                <li class="page-item"><a class="page-link" href="#">3</a></li>
-                <li class="page-item">
-                    <a class="page-link" href="#">Next</a>
-                </li>
-            </ul>
-        </nav>
-        </div>
+        <div class="row" style="justify-content:center">
+            <nav aria-label="Page navigation example">
+                <ul class="pagination pagination-sm"
+                    th:with = "start=(${courseSearchDto.getPageNum() > 2 ? courseSearchDto.getPageNum()- 2 : 1}),
+                                          last = ${start + 3 > maxPage ? maxPage : start + 3}">
+                    <th:block>
+                        <li class="page-item">
+                            <a class="page-link" th:onclick="movePage(1);">&lt;&lt;</a>
+                        </li>
+                        <li class="page-item">
+                            <a class="page-link" th:onclick="movePage(-1);">&lt;</a>
+                        </li>
+                        <li th:each = "page : ${#numbers.sequence(start, last)}"
+                            th:class="${page == courseSearchDto.getPageNum()}?'page-item active'">
+                            <a class="page-link" th:text = "${page}" th:param = "${page}" th:onclick="movePage(this.getAttribute('param'));"></a>
+                        </li>
+                        <li class="page-item">
+                            <a class="page-link" th:onclick="movePage(-2);">&gt;</a>
+                        </li>
+                        <li class="page-item">
+                            <a class="page-link" th:onclick="'movePage(' + ${maxPage} + ')'">&gt;&gt;</a>
+                        </li>
+                    </th:block>
+                </ul>
+            </nav>
         </div>
     </div>
     </div>
 </div>
+<input id="maxPage" type="text" th:value="${maxPage}">
+<input id="pageCategory" type="hidden" th:value="${courseSearchDto.getCategory()}">
+<input id="pageSort" type="hidden" th:value="${courseSearchDto.getSort()}">
+<input id="pageNum" type="hidden" th:value="${courseSearchDto.getPageNum()}">
+<input id="pageSearch" type="hidden" th:value="${courseSearchDto.getSearch()}">
+
+<input id="searchCategory" type="hidden" th:value="${courseSearchDto.getCategory()}">
 </body>
+<script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
+<script src="/javascripts/bootstrap.js"></script>
+<script>
+    $('#sortSelect').change(function(){
+        var category = '/courses'
+        if(document.getElementById('pageCategory').value == ''){
+            category = category + '/' + 'all'
+        }else{
+            category = category + '/' + document.getElementById('pageCategory').value.toLowerCase()
+        }
+
+        var search = document.getElementById('pageSearch').value
+
+        if(search == ''){
+            window.location.href = category + '?sort=' + this.value.toLowerCase()
+        }else{
+            window.location.href = category + '?sort=' + this.value.toLowerCase() + '&' + 'search=' + search
+        }
+
+    })
+
+    function search(){
+        var key = document.getElementById('searchKey').value
+
+        var category = '/courses'
+        if(document.getElementById('pageCategory').value == ''){
+            category = category + '/' + 'all'
+        }else{
+            category = category + '/' + document.getElementById('pageCategory').value.toLowerCase()
+        }
+
+        var sort = document.getElementById('pageSort').value.toLowerCase()
+        if(key == ''){
+            window.location.href = category + '?sort=' + sort
+        }else{
+            window.location.href = category + '?sort=' + sort + '&' + 'search=' + key
+        }
+    }
+
+    function movePage(pageNum){
+
+        var category = '/courses'
+        if(document.getElementById('pageCategory').value == ''){
+            category = category + '/' + 'all'
+        }else{
+            category = category + '/' + document.getElementById('pageCategory').value.toLowerCase()
+        }
+
+        var sort = document.getElementById('pageSort').value.toLowerCase()
+
+        var page = 1
+        if(pageNum == -1){
+            page = parseInt(document.getElementById('pageNum').value) - 1;
+        }
+        else if(pageNum == -2){
+            page = parseInt(document.getElementById('pageNum').value) + 1;
+        }else{
+            page = pageNum
+        }
+        if(page < 1 || page > parseInt(document.getElementById('maxPage').value)){
+            alert('마지막 페이지입니다.')
+            return
+        }
+
+        var search = document.getElementById('pageSearch').value
+
+        if(search == ''){
+            window.location.href = category + '?sort=' + sort + '&' + 'page=' + page
+        }else{
+            window.location.href = category + '?sort=' + sort + '&' + 'page=' + page + '&' + 'search=' + search
+        }
+    }
+
+</script>
 </html>

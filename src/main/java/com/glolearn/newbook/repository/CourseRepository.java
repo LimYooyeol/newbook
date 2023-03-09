@@ -1,26 +1,20 @@
 package com.glolearn.newbook.repository;
 
-import antlr.collections.impl.LList;
 import com.glolearn.newbook.domain.Category;
 import com.glolearn.newbook.domain.Course;
 import com.glolearn.newbook.domain.QCourse;
 import com.glolearn.newbook.domain.QMember;
-import com.glolearn.newbook.dto.course.CourseBriefDto;
 import com.glolearn.newbook.dto.course.CourseSearchDto;
 import com.glolearn.newbook.dto.course.Sort;
 import com.querydsl.core.types.Order;
 import com.querydsl.core.types.OrderSpecifier;
-import com.querydsl.core.types.Predicate;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQuery;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import javax.persistence.EntityManager;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -66,22 +60,30 @@ public class CourseRepository {
         QMember member = QMember.member;
 
         return  query.from(course).join(course.lecturer, member).fetchJoin()
-                .where(isPublished(),
+                .where(
+                        isPublished(),
                         eqCategory(courseSearchDto.getCategory()),
-                        titleLike(courseSearchDto.getSearch()),
-                        courseBy(courseSearchDto.getLecturer())
+                        titleLike(courseSearchDto.getSearch())
                 )
                 .orderBy(getSort(courseSearchDto.getSort()))
-                .offset(courseSearchDto.getPageNum()* courseSearchDto.getPageSize())
+                .offset((courseSearchDto.getPageNum()-1)* courseSearchDto.getPageSize())
                 .limit(courseSearchDto.getPageSize())
                 .fetch();
     }
 
-    private BooleanExpression courseBy(Long memberId) {
-        if(memberId == null){
-            return null;
-        }
-        return member.id.eq(memberId);
+    public Long countCourses(CourseSearchDto courseSearchDto){
+        JPAQuery<Course> query = new JPAQuery<>(em);
+
+        QCourse course = QCourse.course;
+
+        return  query.select(course.count()).from(course)
+                .where(
+                        isPublished(),
+                        eqCategory(courseSearchDto.getCategory()),
+                        titleLike(courseSearchDto.getSearch())
+                )
+                .orderBy(getSort(courseSearchDto.getSort()))
+                .fetchOne();
     }
 
     private OrderSpecifier getSort(Sort sort) {
