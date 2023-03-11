@@ -7,7 +7,7 @@
     <div th:replace = "fragments/nav::nav"></div>
     <div class="row" style="display:flex;">
         <div class="col-5" style="width:300px; height:250px;">
-            <img th:src="${courseDetailsDto.cover}" style = "width:100%;">
+            <img th:src="${courseDetailsDto.cover}" style = "height:100%; width:100%;">
         </div>
         <div class="col-7">
             <div class="row">
@@ -46,14 +46,10 @@
             </div>
         </div>
         <div id="display1" class="col" style="display:none;">
-            <ul class="list-group">
-                <li class="list-group-item">
-                    1. 자바 설치하기
-                    <button style="float:right;"><a href="/course/1/1">보기</a></button>
-                </li>
-                <li class="list-group-item">
-                    2. 변수란?
-                    <button style="float:right;">보기</button>
+            <ul>
+                <li th:each="lecture:${lectures}">
+                    <a th:text="${lecture.title}"
+                       th:href="@{/lecturer/course/{courseId}/{lectureId}(courseId=${courseDetailsDto.id}, lectureId=${lecture.lectureId})}"></a>
                 </li>
             </ul>
         </div>

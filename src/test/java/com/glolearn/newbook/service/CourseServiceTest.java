@@ -83,7 +83,7 @@ class CourseServiceTest {
         //given
 
         //when
-        assertThrows(InvalidDataAccessApiUsageException.class,
+        assertThrows(IllegalArgumentException.class,
                 () -> courseService.removeById(-1L));
     }
 
@@ -138,7 +138,7 @@ class CourseServiceTest {
 
         //then
         assertNotNull(popularCourses);
-        assertEquals((size <5 ? size : 5), popularCourses.size());
+        assertEquals((size < 4 ? size : 4), popularCourses.size());
     }
 
     @Test
@@ -171,13 +171,13 @@ class CourseServiceTest {
 
         // 기본 검색 조건
         CourseSearchDto courseSearchDtoBasic = new CourseSearchDto();
-        courseSearchDtoBasic.setPageNum(2);
+        courseSearchDtoBasic.setPageNum(3);
         courseSearchDtoBasic.setPageSize(6);
         courseSearchDtoBasic.setSort(Sort.RECENT);
 
         // 카테고리가 AI 이면서, 제목에 1이 들어가는 경우
         CourseSearchDto categorySearch = new CourseSearchDto();
-        categorySearch.setPageNum(0);
+        categorySearch.setPageNum(1);
         categorySearch.setPageSize(size);
         categorySearch.setCategory(Category.AI);
         categorySearch.setSearch("1");

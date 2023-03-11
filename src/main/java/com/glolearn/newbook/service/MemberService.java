@@ -21,6 +21,10 @@ public class MemberService {
 
     // 회원 조회(ID)
     public Member findMember(Long id) {
+        if(id == null){
+            return null;
+        }
+
         return memberRepository.findById(id);
     }
 

@@ -6,8 +6,10 @@ import com.glolearn.newbook.domain.Category;
 import com.glolearn.newbook.domain.Course;
 import com.glolearn.newbook.domain.Member;
 import com.glolearn.newbook.dto.course.*;
+import com.glolearn.newbook.dto.lecture.LecturePreviewDto;
 import com.glolearn.newbook.exception.InvalidAccessException;
 import com.glolearn.newbook.service.CourseService;
+import com.glolearn.newbook.service.LectureService;
 import com.glolearn.newbook.service.MemberService;
 import javassist.NotFoundException;
 import lombok.Getter;
@@ -29,6 +31,8 @@ import java.util.List;
 public class CourseController {
     private final CourseService courseService;
     private final MemberService memberService;
+
+    private final LectureService lectureService;
 
     @GetMapping("/course/register")
     @Auth
@@ -86,8 +90,11 @@ public class CourseController {
         if(course == null){
             throw new ResponseStatusException(HttpStatus.NOT_FOUND);
         }
+        List<LecturePreviewDto> lectures = lectureService.findAllByCourseId(course.getId());
+
 
         model.addAttribute("courseDetailsDto", new CourseDetailsDto(course));
+        model.addAttribute("lectures", lectures);
         return "/course/details";
     }
 

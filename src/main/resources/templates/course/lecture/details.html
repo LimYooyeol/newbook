@@ -6,18 +6,31 @@
 <div class="container">
     <div th:replace = "fragments/nav::nav"></div>
     <div class="row">
-        <h3>{course-title}</h3>
+        <h3 th:text="${lecture.courseTitle}">{course-title}</h3>
     </div>
     <div class="row">
-        <h4>{lecture-title}</h4>
+        <h4 th:text="${lecture.lectureTitle}">{lecture-title}</h4>
     </div>
     <hr>
     <div class="row">
-        {강의 내용}
+        <div id="viewer"></div>
     </div>
     <div class="row" style="justify-content:center">
         [&lt;] [목록] [&gt;]
     </div>
 </div>
+<input type="hidden" id="contents" th:value="${lecture.contents}">
 </body>
+
+<script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
+<script src="/javascripts/bootstrap.js"></script>
+<script src="https://uicdn.toast.com/editor/latest/toastui-editor-all.min.js"></script>
+<script>
+    const viewer = toastui.Editor.factory({
+        el: document.getElementById('viewer'),
+        viewer:true,
+        height: '600px',
+        initialValue: document.getElementById('contents').value
+    })
+</script>
 </html>

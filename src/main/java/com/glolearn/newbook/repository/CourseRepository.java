@@ -50,8 +50,8 @@ public class CourseRepository {
         return Optional.ofNullable(em.find(Course.class, courseId));
     }
 
-    public void deleteById(Long courseId) {
-        em.remove(em.find(Course.class, courseId));
+    public void delete(Course course) {
+        em.remove(course);
     }
 
     public List<Course> findCourses(CourseSearchDto courseSearchDto){

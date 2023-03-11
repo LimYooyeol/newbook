@@ -44,13 +44,18 @@ public class CourseService {
     // 코스 삭제
     @Transactional
     public void removeById(Long courseId){
-        courseRepository.deleteById(courseId);
+        Course course = courseRepository.findById(courseId).orElse(null);
+        if(course == null) {throw new IllegalArgumentException("존재하지 않는 코스입니다.");}
+
+        courseRepository.delete(course);
     }
 
     // 코스 업데이트
     @Transactional
     public void modifyCourse(Long courseId, CourseUpdateDto courseUpdateDto){
         Course course = courseRepository.findById(courseId).orElse(null);
+        if(course == null) {throw new IllegalArgumentException("존재하지 않는 코스입니다.");}
+
         course.update(courseUpdateDto);
     }
 
