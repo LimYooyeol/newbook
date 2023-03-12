@@ -10,6 +10,7 @@ import com.glolearn.newbook.dto.course.*;
 import com.glolearn.newbook.dto.lecture.LectureDetailsDto;
 import com.glolearn.newbook.dto.lecture.LecturePreviewDto;
 import com.glolearn.newbook.dto.lecture.LectureRegisterDto;
+import com.glolearn.newbook.dto.lecture.LectureUpdateDto;
 import com.glolearn.newbook.exception.InvalidAccessException;
 import com.glolearn.newbook.service.CourseService;
 import com.glolearn.newbook.service.LectureService;
@@ -188,6 +189,38 @@ public class LecturerController {
         model.addAttribute("lecture", new LectureDetailsDto(lecture));
 
         return "/course/lecture/details";
+    }
+
+
+    //강의 수정 요청
+    @GetMapping("/lecturer/course/{courseId}/{lectureId}/modify")
+    @Auth
+    public String lectureModifyPage(
+            @PathVariable(name = "courseId") Long courseId,
+            @PathVariable(name = "lectureId") Long lectureId,
+            Model model
+    ){
+
+        //인증
+        Member member = memberService.findMember(UserContext.getCurrentMember());
+        if(member == null) { return "redirect:/login";}
+
+        //강의 조회
+        Lecture lecture = lectureService.findById(lectureId);
+        if(lecture == null) {throw new ResponseStatusException(HttpStatus.NOT_FOUND);}
+
+        //인가
+        if(lecture.getCourse().getLecturer().getId() != member.getId()){
+            throw new InvalidAccessException("수정 권한이 없습니다.");
+        }
+
+        //모델 전송
+        model.addAttribute("nickname", member.getNickname());
+        model.addAttribute("courseId", courseId);
+        model.addAttribute("lectureId", lectureId);
+        model.addAttribute("lectureUpdateDto", new LectureUpdateDto(lecture));
+
+        return "/course/lecture/modifyForm";
     }
 
 }

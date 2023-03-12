@@ -59,6 +59,13 @@
                <li th:each="lecture:${lectures}">
                    <a th:text="${lecture.title}"
                         th:href="@{/lecturer/course/{courseId}/{lectureId}(courseId=${course.id}, lectureId=${lecture.lectureId})}"></a>
+                   <a th:text="수정"
+                      th:href="@{/lecturer/course/{courseId}/{lectureId}/modify(courseId=${course.id}, lectureId=${lecture.lectureId})}"></a>
+                   <button th:text="삭제"
+                        th:onclick ="|deleteLecture(
+                        '/course/${course.id}/${lecture.lectureId}'
+                        )|"
+                      th:href="@{/lecturer/course/{courseId}/{lectureId}/modify(courseId=${course.id}, lectureId=${lecture.lectureId})}"></button>
                </li>
             </ul>
             <button><a th:href="@{/lecturer/course/{courseId}/lecture/register(courseId=${course.id})}">강의 추가</a></button>
@@ -66,6 +73,10 @@
     </div>
 </div>
 <form th:action="@{/course/{id}(id=${course.id})}" method="post" id="deleteForm">
+    <input type="hidden" name="_method" value="DELETE">
+</form>
+
+<form method="post" id="deleteLectureForm">
     <input type="hidden" name="_method" value="DELETE">
 </form>
 
@@ -104,6 +115,18 @@
         var input = confirm('정말 삭제하시겠습니까?')
         if(input){
             document.getElementById('deleteForm').submit()
+        }
+    }
+
+    function deleteLecture(action){
+        alert(action)
+        var input = confirm('정말 삭제하시겠습니까?')
+        if(input){
+
+            var form = document.getElementById('deleteLectureForm')
+
+            form.action = action
+            form.submit()
         }
     }
 </script>
